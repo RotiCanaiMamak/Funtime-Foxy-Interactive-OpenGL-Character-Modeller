@@ -209,10 +209,47 @@ bool LoadBMPTexture(const char* filename, GLuint& textureID) {
 	return true;
 }
 
+void calculateNormal(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float* nx, float* ny, float* nz) {
+	//calculate two vectors from the three points
+	float ux = x2 - x1;
+	float uy = y2 - y1;
+	float uz = z2 - z1;
+
+	float vx = x3 - x1;
+	float vy = y3 - y1;
+	float vz = z3 - z1;
+
+	//calculate cross product
+	*nx = (uy * vz) - (uz * vy);
+	*ny = (uz * vx) - (ux * vz);
+	*nz = (ux * vy) - (uy * vx);
+
+	//normalize the normal vector
+	float length = sqrt((*nx) * (*nx) + (*ny) * (*ny) + (*nz) * (*nz));
+	if (length > 0) {
+		*nx /= length;
+		*ny /= length;
+		*nz /= length;
+	}
+}
+
 void drawRectangle3D(float r, float g, float b, float x, float y, float z, float width, float height, GLuint texture) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor3f(r, g, b);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	//calculate normal for the rectangle (using first 3 vertices)
+	float x1 = x, y1 = y, z1 = z;
+	float x2 = x, y2 = y - height, z2 = z;
+	float x3 = x + width, y3 = y - height, z3 = z;
+
+	float nx, ny, nz;
+	calculateNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3, &nx, &ny, &nz);
+
 	glBegin(GL_QUADS);
+	glNormal3f(nx, ny, nz);
 	glTexCoord2f(0, 1);
 	glVertex3f(x, y, z);
 	glTexCoord2f(0, 0);
@@ -276,6 +313,24 @@ void drawBox(float r, float g, float b, float x, float y, float z, float width, 
 	drawRectangle3D(r, g, b, -width / 2, depth / 2, 0, width, depth, texture);
 	glPopMatrix();
 }
+
+void drawTriangle3D(float r, float g, float b, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, GLuint texture) {
+	glColor3f(r, g, b);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	float nx, ny, nz;
+	calculateNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3, &nx, &ny, &nz);
+
+	glBegin(GL_TRIANGLES);
+	glNormal3f(nx, ny, nz);
+	glVertex3f(x1, y1, z1);
+	glVertex3f(x2, y2, z2);
+	glVertex3f(x3, y3, z3);
+	glEnd();
+}	
 
 void drawLine3D(float r, float g, float b, float x1, float y1, float z1, float x2, float y2, float z2, float thick) {
 	glLineWidth(thick);
