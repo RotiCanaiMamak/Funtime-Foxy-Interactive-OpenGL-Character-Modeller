@@ -13,6 +13,7 @@ CONST float PI = 3.14159;
 
 //sphere
 GLUquadricObj* sphere = gluNewQuadric();
+GLUquadricObj* shadow = gluNewQuadric();
 //cone
 GLUquadricObj* cone = gluNewQuadric();
 
@@ -183,6 +184,7 @@ bool initPixelFormat(HDC hdc)
 }
 //--------------------------------------------------------------------
 
+// =================================== ZC (START) ========================================
 bool LoadBMPTexture(const char* filename, GLuint& textureID) {
 	HBITMAP hBMP;
 	BITMAP BMP;
@@ -234,17 +236,16 @@ void calculateNormal(float x1, float y1, float z1, float x2, float y2, float z2,
 }
 
 void drawRectangle3D(float r, float g, float b, float x, float y, float z, float width, float height, GLuint texture) {
-	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor3f(r, g, b);
 	GLfloat col[] = { r,g,b };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	//calculate normal for the rectangle (using first 3 vertices)
 	float x1 = x, y1 = y, z1 = z;
 	float x2 = x, y2 = y - height, z2 = z;
 	float x3 = x + width, y3 = y - height, z3 = z;
-
 	float nx, ny, nz;
 	calculateNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3, &nx, &ny, &nz);
 
@@ -316,10 +317,10 @@ void drawBox(float r, float g, float b, float x, float y, float z, float width, 
 
 void drawTriangle3D(float r, float g, float b, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, GLuint texture) {
 	glColor3f(r, g, b);
-	glBindTexture(GL_TEXTURE_2D, texture);
 	GLfloat col[] = { r,g,b };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	float nx, ny, nz;
 	calculateNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3, &nx, &ny, &nz);
@@ -334,31 +335,124 @@ void drawTriangle3D(float r, float g, float b, float x1, float y1, float z1, flo
 
 void drawLine3D(float r, float g, float b, float x1, float y1, float z1, float x2, float y2, float z2, float thick) {
 	glLineWidth(thick);
-	glBegin(GL_LINES);
 	glColor3f(r, g, b);
+
+	glBegin(GL_LINES);
 	glVertex3f(x1, y1, z1);
 	glVertex3f(x2, y2, z2);
 	glEnd();
 }
 
-void drawSphere(float r, float g, float b, float alpha, float x, float y, float z, float rad, GLuint texture) {
+void shadowSphere(float r, float g, float b, float planeDistance, float sphereX, float sphereRadius, GLfloat* lightPosition) {
+	glDisable(GL_LIGHTING);
+
+	GLfloat shadowMat[16] = {
+		lightPosition[1], 0, 0, 0,
+		-lightPosition[0], 0, -lightPosition[2], -1,
+		0, 0, lightPosition[1], 0,
+		0, 0, 0, lightPosition[1]
+	};
+
 	glPushMatrix();
+	glColor3f(r, g, b);
+	glTranslatef(0, -planeDistance + 0.001, 0);
+	glMultMatrixf(shadowMat);
+	glTranslatef(sphereX, 0, 0);
+	gluSphere(shadow, sphereRadius, 100, 100);
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
+}
+
+void drawSphere(float r, float g, float b, float alpha, float x, float y, float z, float rad, GLuint texture) {
 	glColor4f(r, g, b, alpha);
-	glTranslated(x, y, z);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
 	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glPushMatrix();
+	glTranslated(x, y, z);
 	gluSphere(sphere, rad, 100, 100);
 	glPopMatrix();
 }
 
-void drawCone(float r, float g, float b, float x, float y, float z, float baseRad, float topRad, float height, GLuint texture) {
-	glPushMatrix();
+void drawCylinder(float r, float g, float b, float x, float y, float z, float baseRad, float topRad, float height, GLuint texture) {
 	glColor3f(r, g, b);
-	glTranslated(x, y, z);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
 	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glPushMatrix();
+	glTranslated(x, y, z);
 	gluCylinder(cone, baseRad, topRad, height, 100, 100);
 	glPopMatrix();
 }
 
+void drawDonut(float r, float g, float b, float x, float y, float z, float majorRadius, float minorRadius, int segments, float arcAngle) {
+	//majorRadius: distance from center of torus to center of tube
+	//minorRadius: radius of the tube
+	//segments: number of segments around the major circle
+	//arcAngle: angle in degrees (360 = full donut, 180 = half, 90 = quarter)
+
+	glColor3f(r, g, b);
+	GLfloat col[] = { r, g, b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	//convert arcAngle to radians and calculate how many segments to draw
+	float arcRadians = (arcAngle / 180.0f) * PI; //convert angle to radian (total angle to draw)
+	float angleStep = arcRadians / segments; //angle to turn for the next segment
+
+	int tubeSegments = 20; //number of segments around the tube cross section (higher means rounder)
+
+	for (int i = 0; i < segments; i++) { //draw 1 segment between angle1 and angle2
+		float angle1 = i * angleStep;
+		float angle2 = (i + 1) * angleStep;
+
+		glBegin(GL_QUAD_STRIP);
+		for (int j = 0; j <= tubeSegments; j++) { //draw tube cross section to make it rounder
+			//formula source: https://www.nosco.ch/mathematics/en/torus.php
+			/*
+			function f = torus(r, R, numGridPoints)
+				gridPoints = linspace(0, 2*pi, numGridPoints);
+				[u, v] = meshgrid(gridPoints, gridPoints);
+				x = (R + r * cos(v)) * cos(u);
+				y = (R + r * cos(v)) * sin(u);
+				z = r * sin(v);
+				surf(x, y, z);
+			end
+			*/
+			float tubeAngle = (j * 2 * PI) / tubeSegments; //calculate which face we are currently drawing
+
+			//first ring
+			float x1 = (majorRadius + minorRadius * cos(tubeAngle)) * cos(angle1);
+			float y1 = minorRadius * sin(tubeAngle);
+			float z1 = (majorRadius + minorRadius * cos(tubeAngle)) * sin(angle1);
+
+			//normal for first point
+			float nx1 = cos(tubeAngle) * cos(angle1);
+			float ny1 = sin(tubeAngle);
+			float nz1 = cos(tubeAngle) * sin(angle1);
+			glNormal3f(nx1, ny1, nz1);
+			glVertex3f(x + x1, y + y1, z + z1);
+
+			//second ring
+			float x2 = (majorRadius + minorRadius * cos(tubeAngle)) * cos(angle2);
+			float y2 = minorRadius * sin(tubeAngle);
+			float z2 = (majorRadius + minorRadius * cos(tubeAngle)) * sin(angle2);
+
+			//normal for second point
+			float nx2 = cos(tubeAngle) * cos(angle2);
+			float ny2 = sin(tubeAngle);
+			float nz2 = cos(tubeAngle) * sin(angle2);
+			glNormal3f(nx2, ny2, nz2);
+			glVertex3f(x + x2, y + y2, z + z2);
+		}
+		glEnd();
+	}
+}
 
 void manageRotations() {
 	glMatrixMode(GL_PROJECTION);
@@ -389,6 +483,7 @@ void manageRotations() {
 
 	glMatrixMode(GL_MODELVIEW);
 }
+// =================================== ZC (END) ========================================
 
 void display()
 {
@@ -411,10 +506,11 @@ void display()
 	//glBegin(GL_LINE_LOOP);
 	// ==========================
 
-	manageRotations();
-
 	switch (renderNum) {
+	//ZC
 	case 1:
+		manageRotations();
+		drawDonut(1, 0, 0, 0, 0, 0, 0.5, 0.1, 40, 360);
 
 		break;
 
@@ -477,6 +573,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 	//texture things
 	gluQuadricTexture(sphere, GL_TRUE);
 	gluQuadricNormals(sphere, GLU_SMOOTH);
+	gluQuadricTexture(shadow, GL_TRUE);
+	gluQuadricNormals(shadow, GLU_SMOOTH);
 
 	gluQuadricTexture(cone, GL_TRUE);
 	gluQuadricNormals(cone, GLU_SMOOTH);
