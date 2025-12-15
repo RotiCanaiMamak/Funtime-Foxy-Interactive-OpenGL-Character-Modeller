@@ -359,7 +359,6 @@ void drawCone(float r, float g, float b, float x, float y, float z, float baseRa
 	glPopMatrix();
 }
 
-
 void manageRotations() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -388,6 +387,85 @@ void manageRotations() {
 	glRotated(rotatey, 0, 1, 0);
 
 	glMatrixMode(GL_MODELVIEW);
+}
+
+//qf
+void drawcubeface(float(&arr)[4][3], float colorarr[3], float x, float y, float z) {
+	glBegin(GL_QUADS);
+
+	glColor3f(colorarr[0], colorarr[1], colorarr[2]);
+	glTexCoord2f(0, 0);
+	glVertex3f(arr[0][0] * x, arr[0][1] * y, arr[0][2] * z);
+	glTexCoord2f(1, 0);
+	glVertex3f(arr[1][0] * x, arr[1][1] * y, arr[1][2] * z);
+	glTexCoord2f(1, 1);
+	glVertex3f(arr[2][0] * x, arr[2][1] * y, arr[2][2] * z);
+	glTexCoord2f(0, 1);
+	glVertex3f(arr[3][0] * x, arr[3][1] * y, arr[3][2] * z);
+	glEnd();
+
+}
+
+void drawcube(float x, float y, float z) {
+	float cuboidpoint[4][3] = {
+		{1 ,1,1},
+		{1 ,0,1},
+		{1 ,0,0},
+		{1 ,1,0}
+	};
+	float color[3] = { 1,1,0 };
+	drawcubeface(cuboidpoint, color, x, y, z);
+
+	float cuboidpoint1[4][3] = {
+		{1 ,1,0},
+		{1 ,0,0},
+		{0 ,0,0},
+		{0 ,1,0}
+	};
+	float color1[3] = { 0,1,1 };
+
+	drawcubeface(cuboidpoint1, color1, x, y, z);
+
+	float cuboidpoint2[4][3] = {
+		{1 ,1,1},
+		{0 ,1,1},
+		{0 ,1,0},
+		{1 ,1,0}
+	};
+	float color2[3] = { 0,1,0 };
+
+	drawcubeface(cuboidpoint2, color2, x, y, z);
+
+	float cuboidpoint3[4][3] = {
+		{0 ,0,1},
+		{0 ,0,0},
+		{1 ,0,0},
+		{1 ,0,1}
+	};
+	float color3[3] = { 1,0,1 };
+
+	drawcubeface(cuboidpoint3, color3, x, y, z);
+
+	float cuboidpoint4[4][3] = {
+		{0 ,1,1},
+		{0 ,1,0},
+		{0 ,0,0},
+		{0 ,0,1}
+	};
+	float color4[3] = { 1,0,0 };
+
+	drawcubeface(cuboidpoint4, color4, x, y, z);
+
+	float cuboidpoint5[4][3] = {
+		{1 ,1,1},
+		{1 ,0,1},
+		{0 ,0,1},
+		{0 ,1,1}
+	};
+	float color5[3] = { 1,1,1 };
+
+	drawcubeface(cuboidpoint5, color5, x, y, z);
+
 }
 
 void display()
@@ -482,7 +560,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 	gluQuadricNormals(cone, GLU_SMOOTH);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	LoadBMPTexture("water.bmp", waterTex);
+	//LoadBMPTexture("water.bmp", waterTex);
 
 	glEnable(GL_TEXTURE_2D);
 
