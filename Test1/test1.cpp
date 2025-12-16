@@ -3,11 +3,17 @@
 #include <math.h>
 #include <gl/GLU.h>
 #include <string>
+#include <cmath>
 
 #pragma comment (lib, "OpenGL32.lib")
 #pragma comment (lib, "GLU32.lib")
 
 #define WINDOW_TITLE "OpenGL Window"
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+
 
 CONST float PI = 3.14159;
 
@@ -19,12 +25,30 @@ GLUquadricObj* cone = gluNewQuadric();
 
 int renderNum = 1;
 
+//For Arm
+// Rotation
+float RotationX = 0.0f;
+float RotationY = 0.0f;
+float RotationZ = 0.0f;
+float rotationSpeed = 1.0f;
+
+//Rotation of Arm
+float upperArmRotation = 0.0f;
+float lowerArmRotation = 0.0f;
+float upperArmRotation2 = 0.0f;
+bool faceOpen = false;
+
 //view perspective
 float rotatex = 0, rotatey = 0, rotatez = 0;
 float rotateinc = 5;
 float translatex = 0, translatey = 0, translatez = 0;
 float translateinc = 0.1;
 bool changeView = false;
+
+// Mouse rotation
+bool isMouseDown = false;
+int lastMouseX = 0, lastMouseY = 0;
+float mouseRotateX = 0, mouseRotateY = 0;
 
 GLuint waterTex = 0;
 
@@ -37,6 +61,29 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+
+	case WM_LBUTTONDOWN:
+		isMouseDown = true;
+		lastMouseX = LOWORD(lParam);
+		lastMouseY = HIWORD(lParam);
+		break;
+
+	case WM_LBUTTONUP:
+		isMouseDown = false;
+		break;
+
+	case WM_MOUSEMOVE:
+		if (isMouseDown) {
+			int currentX = LOWORD(lParam);
+			int currentY = HIWORD(lParam);
+
+			mouseRotateY += (currentX - lastMouseX) * 0.5f;
+			mouseRotateX += (currentY - lastMouseY) * 0.5f;
+
+			lastMouseX = currentX;
+			lastMouseY = currentY;
+		}
 		break;
 
 	case WM_KEYDOWN:
@@ -114,6 +161,34 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			translatez -= translateinc;
 			break;
 
+			//ch
+		case 'H':    // Lower arm up
+			lowerArmRotation += rotationSpeed;
+			if (lowerArmRotation > 90.0f) lowerArmRotation = 90.0f;
+			break;
+
+		case 'N':  // Lower arm down
+			lowerArmRotation -= rotationSpeed;
+			if (lowerArmRotation < -90.0f) lowerArmRotation = -90.0f;
+			break;
+
+		case 'M': // Rotate whole arm right
+			upperArmRotation += rotationSpeed;
+			break;
+
+		case 'B':  // Rotate whole arm left
+			upperArmRotation -= rotationSpeed;
+			break;
+
+		case 'J':  // Rotate whole arm to left
+			upperArmRotation2 -= rotationSpeed;
+			break;
+
+		case 'G':  // Rotate whole arm to right
+			upperArmRotation2 += rotationSpeed;
+			break;
+			//
+
 		case 'U':
 
 			break;
@@ -123,7 +198,7 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case 'K':
-
+			faceOpen = !faceOpen; 
 			break;
 
 		case 'Y':
@@ -564,6 +639,475 @@ void drawcube(float x, float y, float z) {
 
 }
 
+
+//ch
+
+float degreeToRadian(int degree) {
+	return degree * (PI / 180.0f);
+}
+
+// Draw face de
+void drawFilledCube(float r, float g, float b, float x, float y, float z, float width, float height, float depth) {
+	glColor3f(r, g, b);
+
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+
+	// Front face
+	glBegin(GL_QUADS);
+	glNormal3f(0, 0, 1);
+	glVertex3f(0, height, depth);
+	glVertex3f(width, height, depth);
+	glVertex3f(width, 0, depth);
+	glVertex3f(0, 0, depth);
+	glEnd();
+
+	// Back face
+	glBegin(GL_QUADS);
+	glNormal3f(0, 0, -1);
+	glVertex3f(0, height, 0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(width, 0, 0);
+	glVertex3f(width, height, 0);
+	glEnd();
+
+	// Top face
+	glBegin(GL_QUADS);
+	glNormal3f(0, 1, 0);
+	glVertex3f(0, height, 0);
+	glVertex3f(width, height, 0);
+	glVertex3f(width, height, depth);
+	glVertex3f(0, height, depth);
+	glEnd();
+
+	// Bottom face
+	glBegin(GL_QUADS);
+	glNormal3f(0, -1, 0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 0, depth);
+	glVertex3f(width, 0, depth);
+	glVertex3f(width, 0, 0);
+	glEnd();
+
+	// Right face
+	glBegin(GL_QUADS);
+	glNormal3f(1, 0, 0);
+	glVertex3f(width, height, 0);
+	glVertex3f(width, 0, 0);
+	glVertex3f(width, 0, depth);
+	glVertex3f(width, height, depth);
+	glEnd();
+
+	// Left face
+	glBegin(GL_QUADS);
+	glNormal3f(-1, 0, 0);
+	glVertex3f(0, height, 0);
+	glVertex3f(0, height, depth);
+	glVertex3f(0, 0, depth);
+	glVertex3f(0, 0, 0);
+	glEnd();
+
+	glPopMatrix();
+}
+
+//Ear
+void drawPyramid(float r, float g, float b, float x, float y, float z, float base, float height) {
+	glColor3f(r, g, b);
+
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+
+	float halfBase = base / 2.0f;
+
+	// Bottom face
+	glBegin(GL_QUADS);
+	glNormal3f(0, -1, 0);
+	glVertex3f(-halfBase, 0, -halfBase);
+	glVertex3f(halfBase, 0, -halfBase);
+	glVertex3f(halfBase, 0, halfBase);
+	glVertex3f(-halfBase, 0, halfBase);
+	glEnd();
+
+	// Front face
+	glBegin(GL_TRIANGLES);
+	glNormal3f(0, 0.6f, 0.8f);
+	glVertex3f(0, height, 0);
+	glVertex3f(-halfBase, 0, halfBase);
+	glVertex3f(halfBase, 0, halfBase);
+	glEnd();
+
+	// Back face
+	glBegin(GL_TRIANGLES);
+	glNormal3f(0, 0.6f, -0.8f);
+	glVertex3f(0, height, 0);
+	glVertex3f(halfBase, 0, -halfBase);
+	glVertex3f(-halfBase, 0, -halfBase);
+	glEnd();
+
+	// Right face
+	glBegin(GL_TRIANGLES);
+	glNormal3f(0.8f, 0.6f, 0);
+	glVertex3f(0, height, 0);
+	glVertex3f(halfBase, 0, halfBase);
+	glVertex3f(halfBase, 0, -halfBase);
+	glEnd();
+
+	// Left face
+	glBegin(GL_TRIANGLES);
+	glNormal3f(-0.8f, 0.6f, 0);
+	glVertex3f(0, height, 0);
+	glVertex3f(-halfBase, 0, -halfBase);
+	glVertex3f(-halfBase, 0, halfBase);
+	glEnd();
+
+	glPopMatrix();
+}
+
+//Sphere(Eyeball?)
+void drawSphere2(float r, float g, float b, float x, float y, float z, float radius) {
+	glColor3f(r, g, b);
+
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	gluSphere(sphere, radius, 30, 30);
+	glPopMatrix();
+}
+
+//Cylinder
+void drawCylinder2(float r, float g, float b, float x, float y, float z, float radius, float height) {
+	glColor3f(r, g, b);
+
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glRotatef(-90, 1, 0, 0);
+	gluCylinder(cone, radius, radius, height, 30, 30);
+	glPopMatrix();
+}
+
+// Draw 3D Oval
+void drawOval3D(float r, float g, float b, float x, float y, float z, float radiusX, float radiusY, float radiusZ) {
+	glColor3f(r, g, b);
+
+	// Add material properties for lighting
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glScalef(radiusX, radiusY, radiusZ); // Scale the sphere to make it oval
+	gluSphere(sphere, 1.0f, 30, 30);
+	glPopMatrix();
+}
+
+//Snout
+void drawSnout(float r, float g, float b,
+	float x, float y, float z,
+	float width, float height, float depth)
+{
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glScalef(width, height, depth);
+
+	drawSphere2(r, g, b, 0, 0, 0, 1.0f);
+
+	glPopMatrix();
+}
+
+//Hemishpere
+void drawHemisphere(float r, float g, float b, float x, float y, float z, float radius, bool frontHalf) {
+	glColor3f(r, g, b);
+
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+
+	// Draw hemisphere using quad strips
+	int stacks = 15;
+	int slices = 30;
+
+	for (int i = 0; i < stacks; i++) {
+		float lat0 = M_PI * (-0.5 + (float)(i) / stacks);
+		float lat1 = M_PI * (-0.5 + (float)(i + 1) / stacks);
+
+		// For front hemisphere, only draw front half (z >= 0)
+		// For back hemisphere, only draw back half (z <= 0)
+		if (frontHalf && lat0 > 0) continue;
+		if (!frontHalf && lat1 < 0) continue;
+
+		glBegin(GL_QUAD_STRIP);
+		for (int j = 0; j <= slices; j++) {
+			float lng = 2 * M_PI * (float)(j) / slices;
+
+			float x0 = cos(lat0) * cos(lng);
+			float y0 = sin(lat0);
+			float z0 = cos(lat0) * sin(lng);
+
+			float x1 = cos(lat1) * cos(lng);
+			float y1 = sin(lat1);
+			float z1 = cos(lat1) * sin(lng);
+
+			// Apply hemisphere filtering
+			if (frontHalf) {
+				if (z0 < 0) z0 = 0;
+				if (z1 < 0) z1 = 0;
+			}
+			else {
+				if (z0 > 0) z0 = 0;
+				if (z1 > 0) z1 = 0;
+			}
+
+			glNormal3f(x0, y0, z0);
+			glVertex3f(radius * x0, radius * y0, radius * z0);
+
+			glNormal3f(x1, y1, z1);
+			glVertex3f(radius * x1, radius * y1, radius * z1);
+		}
+		glEnd();
+	}
+
+	glPopMatrix();
+}
+
+// Function to draw one quarter of front hemisphere
+void drawFaceQuarter(float r, float g, float b, float x, float y, float z, float radius, int quarter) {
+	glColor3f(r, g, b);
+
+	GLfloat col[] = { r, g, b, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+
+	int stacks = 15;
+	int slices = 30;
+
+	// Define angle ranges for each quarter
+	float startLng, endLng, startLat, endLat;
+
+	switch (quarter) {
+	case 1: // Top-right
+		startLng = 0; endLng = M_PI / 2;
+		startLat = 0; endLat = M_PI / 2;
+		break;
+	case 2: // Top-left  
+		startLng = M_PI / 2; endLng = M_PI;
+		startLat = 0; endLat = M_PI / 2;
+		break;
+	case 3: // Bottom-left
+		startLng = M_PI; endLng = 3 * M_PI / 2;
+		startLat = 0; endLat = M_PI / 2;
+		break;
+	case 4: // Bottom-right
+		startLng = 3 * M_PI / 2; endLng = 2 * M_PI;
+		startLat = 0; endLat = M_PI / 2;
+		break;
+	}
+
+	// Draw the quarter sphere
+	for (int i = 0; i < stacks / 2; i++) { // Only front half
+		float lat0 = startLat + (endLat - startLat) * (float)(i) / (stacks / 2);
+		float lat1 = startLat + (endLat - startLat) * (float)(i + 1) / (stacks / 2);
+
+		glBegin(GL_QUAD_STRIP);
+		for (int j = 0; j <= slices / 4; j++) { // Quarter of slices
+			float lng0 = startLng + (endLng - startLng) * (float)(j) / (slices / 4);
+			float lng1 = lng0;
+
+			float x0 = cos(lat0) * cos(lng0);
+			float y0 = sin(lat0);
+			float z0 = cos(lat0) * sin(lng0);
+
+			float x1 = cos(lat1) * cos(lng1);
+			float y1 = sin(lat1);
+			float z1 = cos(lat1) * sin(lng1);
+
+			// Only draw front hemisphere
+			if (z0 >= 0 && z1 >= 0) {
+				glNormal3f(x0, y0, z0);
+				glVertex3f(radius * x0, radius * y0, radius * z0);
+
+				glNormal3f(x1, y1, z1);
+				glVertex3f(radius * x1, radius * y1, radius * z1);
+			}
+		}
+		glEnd();
+	}
+
+	glPopMatrix();
+}
+
+//Draw Foxy Head
+void drawFuntimeFoxyHead() {
+	glPushMatrix();
+
+	// Back hemisphere (static - always visible)
+	drawHemisphere(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, false);
+
+	// Front face quarters (can rotate when faceOpen is true)
+	if (!faceOpen) {
+		// Closed state - draw complete front hemisphere
+		drawHemisphere(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, true);
+	}
+	else {
+		// Open state - draw 4 rotating quarters
+		float rotationAngle = 45.0f; // Adjust this for opening amount
+
+		// Top-right quarter
+		glPushMatrix();
+		glTranslatef(0.0f, 0.5f, 0.0f); // Move to head center
+		glRotatef(rotationAngle, 1, 1, 0); // Rotate around top-right axis
+		glTranslatef(0.0f, -0.5f, 0.0f); // Move back
+		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 1);
+		glPopMatrix();
+
+		// Top-left quarter  
+		glPushMatrix();
+		glTranslatef(0.0f, 0.5f, 0.0f);
+		glRotatef(rotationAngle, -1, 1, 0);
+		glTranslatef(0.0f, -0.5f, 0.0f);
+		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 2);
+		glPopMatrix();
+
+		// Bottom-left quarter
+		glPushMatrix();
+		glTranslatef(0.0f, 0.5f, 0.0f);
+		glRotatef(rotationAngle, -1, -1, 0);
+		glTranslatef(0.0f, -0.5f, 0.0f);
+		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 3);
+		glPopMatrix();
+
+		// Bottom-right quarter
+		glPushMatrix();
+		glTranslatef(0.0f, 0.5f, 0.0f);
+		glRotatef(rotationAngle, 1, -1, 0);
+		glTranslatef(0.0f, -0.5f, 0.0f);
+		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 4);
+		glPopMatrix();
+	}
+
+	glPopMatrix();
+
+
+	// Left cheek
+	glPushMatrix();
+	glScalef(1,1,1.6f);
+	glTranslatef(-0.35f, 0.35f, 0.0f);  
+	glRotatef(135, 1, 0, 0);        
+	drawOval3D(1.0f, 1.0f, 1.0f,0.0f, 0.0f, 0.0f,0.15f, 0.18f, 0.08f);
+	glPopMatrix();
+
+	//Right Cheek
+	glPushMatrix();
+	glScalef(1, 1, 1.6f);
+	glTranslatef(0.35f, 0.35f, 0.0f);
+	glRotatef(135, 1, 0, 0);
+	drawOval3D(1.0f, 1.0f, 1.0f,0.0f, 0.0f, 0.0f,0.15f, 0.18f, 0.08f);
+	glPopMatrix();
+
+	// Right ear
+	glPushMatrix();
+	glTranslatef(0.22f, 0.95f, -0.05f);  
+	glRotatef(90, 0, 1, 0);
+	drawOval3D(1.0f, 0.7f, 0.85f,
+		0.0f, 0.0f, 0.0f,
+		0.07f, 0.22f, 0.15f);
+	glPopMatrix();
+
+	// Left ear
+	glPushMatrix();
+	glTranslatef(-0.22f, 0.95f, -0.05f);
+	glRotatef(90, 0, 1, 0);
+	drawOval3D(1.0f, 0.7f, 0.85f,
+		0.0f, 0.0f, 0.0f,
+		0.07f, 0.22f, 0.15f);
+	glPopMatrix();
+
+	// Left pink cheek ball
+	glPushMatrix();
+	glTranslatef(-0.25f, 0.35f, 0.28f);   
+	drawSphere2(1.0f, 0.4f, 0.6f,         
+		0.0f, 0.0f, 0.0f,
+		0.08f);                 
+	glPopMatrix();
+
+	// Right pink cheek ball
+	glPushMatrix();
+	glTranslatef(0.25f, 0.35f, 0.28f);
+	drawSphere2(1.0f, 0.4f, 0.6f,
+		0.0f, 0.0f, 0.0f,
+		0.08f);
+	glPopMatrix();
+
+	//Upper jaw
+	glPushMatrix();
+	drawSnout(
+		1.0f, 0.4f, 0.6f,   // colour
+		0.0f, 0.36f, 0.45f, // position
+		0.22f, 0.1f, 0.3f // size
+	);
+	glPopMatrix();
+
+	//Lower jaw
+	glPushMatrix();
+	glRotatef(45,1.0f,0.0f,0.0f);
+	drawSnout(
+		1.0f, 0.4f, 0.6f,   // colour
+		0.0f, 0.34f, 0.21f, // position
+		0.22f, 0.07f, 0.28f // size
+	);
+	glPopMatrix();
+}
+
+void DrawRobotArm()
+{
+	glPushMatrix();
+
+	// Whole arm rotation
+	glRotatef(upperArmRotation, 0, 0, 1);
+	glRotatef(upperArmRotation2, 0, 1, 0);
+
+	// Upper arm (fixed position)
+	glPushMatrix();
+	glScaled(0.3, 1.0, 0.3);
+	//DrawCubeLine (0, 0, 0);
+	glPopMatrix();
+
+	glTranslatef(0.15f, 0.8f, 0);
+
+	// Apply lower arm rotation
+	glRotatef(lowerArmRotation, 0, 0.0, 1);
+	glTranslatef(-0.15f, -0.05f, 0);
+	// Lower arm
+	glPushMatrix();
+	glScaled(0.3, 1.0, 0.3);
+	//DrawCubeLine(0, 0, 0);
+	glPopMatrix();
+
+
+	glPopMatrix();
+}
+
 void display()
 {
 	glClearColor(0.529, 0.808, 0.922, 1);
@@ -593,13 +1137,58 @@ void display()
 
 		break;
 
+		
 	case 2: {
 	
 	}
 
+	//CH
+	case 3: {
+		glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
 
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 
+		// Camera position
+		glTranslatef(translatex, translatey, -3.5f + translatez);
+
+		// Apply mouse rotation
+		glRotatef(mouseRotateX, 1, 0, 0);
+		glRotatef(mouseRotateY, 0, 1, 0);
+
+		// Apply keyboard rotation
+		glRotatef(rotatex, 1, 0, 0);
+		glRotatef(rotatey, 0, 1, 0);
+
+		// Enable lighting
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+
+		GLfloat lightPos[] = { 2.0f, 3.0f, 2.0f, 1.0f };
+		GLfloat lightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+		GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+
+		glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+
+		drawFuntimeFoxyHead();
+
+		/*
+		glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glShadeModel(GL_SMOOTH);
+		glLoadIdentity();
+		glScaled(0.5, 0.5, 0.5);
+		DrawRobotArm();
+		*/
+	}
+		  break;
 	}
 
 
