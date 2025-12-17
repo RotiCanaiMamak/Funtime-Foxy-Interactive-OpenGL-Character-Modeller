@@ -38,7 +38,7 @@ float lowerArmRotation = 0.0f;
 float upperArmRotation2 = 0.0f;
 bool faceOpen = false;
 float faceOpenAngle = 0.0f;
-float faceOpenSpeed = 0.25f;
+float faceOpenSpeed = 0.9f;
 bool showJaw = true;
 
 //view perspective
@@ -1323,13 +1323,11 @@ void drawHemisphere(float r, float g, float b, float x, float y, float z, float 
 		float lat0 = M_PI * (-0.5 + (float)(i) / stacks);
 		float lat1 = M_PI * (-0.5 + (float)(i + 1) / stacks);
 
-		// For front hemisphere, only draw front half (z >= 0)
-		// For back hemisphere, only draw back half (z <= 0)
 		if (frontHalf && lat0 > 0) continue;
 		if (!frontHalf && lat1 < 0) continue;
 
 		glBegin(GL_QUAD_STRIP);
-		for (int j = 0; j <= slices; j++) {
+		for (int j = 0; j < slices; j++) {
 			float lng = 2 * M_PI * (float)(j) / slices;
 
 			float x0 = cos(lat0) * cos(lng);
@@ -1505,7 +1503,7 @@ void rotateLowerLeftFace(float angle)
 	glTranslatef(0.05f, -0.08f, 0.0f);
 
 	// Rotate OUTWARD (around Y axis)
-	glRotatef(205, 0.0f, 1.0f, 0.0f);
+	glRotatef(195, 0.0f, 1.0f, 0.0f);
 
 	// Move back from hinge
 	glTranslatef(-0.05f, 0.08f, 0.0f);
@@ -1586,6 +1584,8 @@ void drawFuntimeFoxyHead() {
 	// Back hemisphere (static - always visible)
 	drawHemisphere(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, false);
 
+	drawLowerBackFace();
+
 	// Front face quarters (can rotate when faceOpen is true)
 	if (!faceOpen) {
 		// Closed state - draw complete front hemisphere
@@ -1604,9 +1604,6 @@ void drawFuntimeFoxyHead() {
 	}
 	glPopMatrix();
 
-	
-	//LowerBack Head
-	drawLowerBackFace();
 
 	// Left cheek
 	glPushMatrix();
@@ -1642,20 +1639,35 @@ void drawFuntimeFoxyHead() {
 		0.07f, 0.22f, 0.15f);
 	glPopMatrix();
 
-	// Left pink cheek ball
+	// Left pink cheek (FLAT)
 	glPushMatrix();
-	glTranslatef(-0.25f, 0.35f, 0.21f);   
-	drawSphere2(1.0f, 0.4f, 0.6f,         
+	glTranslatef(-0.25f, 0.365f, 0.3f);
+
+	glRotatef(-45, -0.7,1,0);
+	glScalef(1.0f, 1.0f, 0.25f);
+
+	drawSphere2(
+		1.0f, 0.4f, 0.6f,
 		0.0f, 0.0f, 0.0f,
-		0.08f);
+		0.08f
+	);
+
 	glPopMatrix();
 
-	// Right pink cheek ball
+
+	// Right pink cheek (FLAT)
 	glPushMatrix();
-	glTranslatef(0.25f, 0.35f, 0.21f);
-	drawSphere2(1.0f, 0.4f, 0.6f,
+	glTranslatef(0.25f, 0.365f, 0.3f);
+
+	glRotatef(45, 0.7, 1, 0);
+	glScalef(1.0f, 1.0f, 0.25f);
+
+	drawSphere2(
+		1.0f, 0.4f, 0.6f,
 		0.0f, 0.0f, 0.0f,
-		0.08f);
+		0.08f
+	);
+
 	glPopMatrix();
 
 	if (showJaw) {
@@ -1678,35 +1690,6 @@ void drawFuntimeFoxyHead() {
 		);
 		glPopMatrix();
 	}
-}
-
-void DrawRobotArm()
-{
-	glPushMatrix();
-
-	// Whole arm rotation
-	glRotatef(upperArmRotation, 0, 0, 1);
-	glRotatef(upperArmRotation2, 0, 1, 0);
-
-	// Upper arm (fixed position)
-	glPushMatrix();
-	glScaled(0.3, 1.0, 0.3);
-	//DrawCubeLine (0, 0, 0);
-	glPopMatrix();
-
-	glTranslatef(0.15f, 0.8f, 0);
-
-	// Apply lower arm rotation
-	glRotatef(lowerArmRotation, 0, 0.0, 1);
-	glTranslatef(-0.15f, -0.05f, 0);
-	// Lower arm
-	glPushMatrix();
-	glScaled(0.3, 1.0, 0.3);
-	//DrawCubeLine(0, 0, 0);
-	glPopMatrix();
-
-
-	glPopMatrix();
 }
 
 void rotateFaceQuarter(float angle,float axisX, float axisY,int quarter) {
@@ -1768,19 +1751,18 @@ void display()
 	switch (renderNum) {
 		//ZC
 	case 1:
-		manageRotations();
+		//manageRotations();
 
-		glPushMatrix();
+		//glPushMatrix();
 		//glScaled(0.5, 0.5, 0.5);
-		drawEntireHead();
-		glPopMatrix();
-		break;
+		//drawEntireHead();
+		//glPopMatrix();
+		//break;
 
 
 	case 2: {
 
 	}
-
 		  //CH
 	case 3: {
 		glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
@@ -1816,16 +1798,12 @@ void display()
 		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
+		glScalef(1.4,1.4,1.4);
 		drawFuntimeFoxyHead();
 
-		/*
-		glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glShadeModel(GL_SMOOTH);
-		glLoadIdentity();
-		glScaled(0.5, 0.5, 0.5);
-		DrawRobotArm();
-		*/
+		glTranslatef(0,0.6,0);
+		glScaled(0.3, 0.3, 0.3);
+		//drawEntireHead();
 	}
 		  break;
 	}
