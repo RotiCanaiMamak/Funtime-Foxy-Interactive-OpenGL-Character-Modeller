@@ -1528,7 +1528,7 @@ void rotateLowerRightFace(float angle)
 {
 	glPushMatrix();
 
-	glTranslatef(0.08f, 0.97f, 0.0f);
+	glTranslatef(0.085f, 0.97f, 0.047f);
 
 	glRotatef(180, 1, 0, 0);
 
