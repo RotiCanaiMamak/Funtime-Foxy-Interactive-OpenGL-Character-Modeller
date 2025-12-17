@@ -1723,6 +1723,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 
 	LoadBMPTexture("metal.bmp", metalTex);
 	LoadBMPTexture("white.bmp", whiteTex);
+	LoadBMPTexture("teeth.bmp", teethTex);
 
 	glEnable(GL_TEXTURE_2D);
 
