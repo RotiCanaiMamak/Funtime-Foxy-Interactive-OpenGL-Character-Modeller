@@ -22,6 +22,8 @@ GLUquadricObj* sphere = gluNewQuadric();
 GLUquadricObj* shadow = gluNewQuadric();
 //cone
 GLUquadricObj* cone = gluNewQuadric();
+GLUquadricObj* cylinder = gluNewQuadric();
+GLUquadricObj* disk = gluNewQuadric();
 
 int renderNum = 1;
 
@@ -57,6 +59,8 @@ float mouseRotateX = 0, mouseRotateY = 0;
 GLuint metalTex = 0;
 GLuint whiteTex = 0;
 GLuint teethTex = 0;
+GLuint plasticTex = 0;
+GLuint eyeTex = 0;
 
 BITMAP BMP;
 HBITMAP hBMP = NULL;
@@ -71,6 +75,7 @@ float isBlinked = 0;
 
 //rotation testing
 float testAngle = 0;
+float testAngle2 = 0;
 
 LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -187,6 +192,7 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			if (testAngle > 10) {
 				testAngle = 0;
 			}
+			testAngle2++;
 			break;
 
 			//ch
@@ -289,6 +295,9 @@ bool initPixelFormat(HDC hdc)
 //--------------------------------------------------------------------
 
 // =================================== ZC (START) ========================================
+//ch's function for me
+void drawOval3D(float r, float g, float b, float x, float y, float z, float radiusX, float radiusY, float radiusZ);
+
 bool LoadBMPTexture(const char* filename, GLuint& textureID) {
 	HBITMAP hBMP;
 	BITMAP BMP;
@@ -499,7 +508,90 @@ void drawDonut(float r, float g, float b, float majorRadius, float minorRadius, 
 	//minorRadius: radius of the tube
 	//segments: number of segments around the major circle
 	//arcAngle: angle in degrees (360 = full donut, 180 = half, 90 = quarter)
-	float segmentsToDraw = 20;
+	float segmentsToDraw = 10;
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glColor3f(r, g, b);
+	GLfloat col[] = { r, g, b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	//convert arcAngle to radians and calculate how many segments to draw
+	float arcRadians = (arcAngle / 180.0f) * PI; //convert angle to radian (total angle to draw)
+	float angleStep = arcRadians / segmentsToDraw; //angle to turn for the next segment
+
+	int tubeSegments = 20; //number of segments around the tube cross section (higher means rounder)
+
+	for (int i = 0; i < segmentsToDraw; i++) { //draw 1 segment between angle1 and angle2
+		float angle1 = i * angleStep;
+		float angle2 = (i + 1) * angleStep;
+
+		//texture coordinate for major circle (0 to 1 along the donut)
+		float u1, u2;
+
+		if (flipTex) {
+			u1 = 1.0f - (float)i / segmentsToDraw;
+			u2 = 1.0f - (float)(i + 1) / segmentsToDraw;
+		}
+		else {
+			u1 = (float)i / segmentsToDraw;
+			u2 = (float)(i + 1) / segmentsToDraw;
+		}
+
+		glBegin(GL_QUAD_STRIP);
+		for (int j = 0; j <= tubeSegments; j++) { //draw tube cross section to make it rounder
+			//formula source: https://www.nosco.ch/mathematics/en/torus.php
+			/*
+			function f = torus(r, R, numGridPoints)
+				gridPoints = linspace(0, 2*pi, numGridPoints);
+				[u, v] = meshgrid(gridPoints, gridPoints);
+				x = (R + r * cos(v)) * cos(u);
+				y = (R + r * cos(v)) * sin(u);
+				z = r * sin(v);
+				surf(x, y, z);
+			end
+			*/
+			float tubeAngle = (j * 2 * PI) / tubeSegments; //calculate which face we are currently drawing
+
+			//texture coordinate for tube cross section (0 to 1 around the tube)
+			float v = (float)j / tubeSegments;
+
+			//first ring
+			float x1 = (majorRadius + minorRadius * cos(tubeAngle)) * cos(angle1);
+			float y1 = minorRadius * sin(tubeAngle);
+			float z1 = (majorRadius + minorRadius * cos(tubeAngle)) * sin(angle1);
+
+			//normal for first point
+			float nx1 = cos(tubeAngle) * cos(angle1);
+			float ny1 = sin(tubeAngle);
+			float nz1 = cos(tubeAngle) * sin(angle1);
+			glNormal3f(flipX * nx1, flipY * ny1, flipZ * nz1);
+			glTexCoord2f(u1, v);
+			glVertex3f(x1, y1, z1);
+
+			//second ring
+			float x2 = (majorRadius + minorRadius * cos(tubeAngle)) * cos(angle2);
+			float y2 = minorRadius * sin(tubeAngle);
+			float z2 = (majorRadius + minorRadius * cos(tubeAngle)) * sin(angle2);
+
+			//normal for second point
+			float nx2 = cos(tubeAngle) * cos(angle2);
+			float ny2 = sin(tubeAngle);
+			float nz2 = cos(tubeAngle) * sin(angle2);
+			glNormal3f(flipX * nx2, flipY * ny2, flipZ * nz2);
+			glTexCoord2f(u2, v);
+			glVertex3f(x2, y2, z2);
+		}
+		glEnd();
+	}
+}
+
+void drawDonutLow(float r, float g, float b, float majorRadius, float minorRadius, float arcAngle, GLuint texture, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	//majorRadius: distance from center of torus to center of tube
+	//minorRadius: radius of the tube
+	//segments: number of segments around the major circle
+	//arcAngle: angle in degrees (360 = full donut, 180 = half, 90 = quarter)
+	float segmentsToDraw = 3;
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor3f(r, g, b);
@@ -593,7 +685,7 @@ void drawDonutOutline(float r, float g, float b, float majorRadius, float minorR
 	float realNumCircles = (arcAngle / 360) * numCircles; //calculate how many lines to draw based on the arcangle
 	float angleStep = arcRadians / (realNumCircles - 1); //divide by numCircles-1 to include both start and end
 
-	int tubeSegments = 50; //number of points to create smooth circle
+	int tubeSegments = 10; //number of points to create smooth circle
 
 	//draw vertical circles at evenly spaced positions
 	for (int i = 0; i < realNumCircles; i++) {
@@ -759,7 +851,7 @@ void drawEye() {
 	//eye
 	glPushMatrix();
 	glTranslated(-0.3, -0.1, 0.5);
-	drawSphere(1, 1, 1, 1, 0, 0, 0, 0.25, whiteTex);
+	drawSphere(1, 1, 1, 1, 0, 0, 0, 0.25, eyeTex);
 	glPopMatrix();
 
 	//right eye
@@ -808,7 +900,7 @@ void drawEye() {
 	//eye
 	glPushMatrix();
 	glTranslated(0.3, -0.1, 0.5);
-	drawSphere(1, 1, 1, 1, 0, 0, 0, 0.25, whiteTex);
+	drawSphere(1, 1, 1, 1, 0, 0, 0, 0.25, eyeTex);
 	glPopMatrix();
 }
 
@@ -942,12 +1034,84 @@ void drawNose() {
 	glPopMatrix();
 }
 
+void drawCurve(float r, float g, float b, float length, GLuint texture, bool leftTrue = true, bool rightTrue = true, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	for (int i = -39; i < 40; i++) {
+		glPushMatrix();
+		glTranslated(0.01 * i, length * 0.32, length * 0.32);
+		glRotatef(90, 0, 0, 1);
+		drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+		glPopMatrix();
+	}
+
+
+	if (leftTrue) {
+		for (int i = 0; i > -6; i--) {
+			glPushMatrix();
+			glTranslated(-0.4, length * 0.32, length * 0.32);
+			glTranslated(0, 0, -(length / 2));
+			glRotatef(1 * i, 0, 1, 0); //left right
+			glTranslated(0, 0, (length / 2));
+			glRotatef(90, 0, 0, 1);
+			drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+			glPopMatrix();
+		}
+	}
+	if (rightTrue) {
+		for (int i = 0; i < 6; i++) {
+			glPushMatrix();
+			glTranslated(0.4, length * 0.32, length * 0.32);
+			glTranslated(0, 0, -(length / 2));
+			glRotatef(1 * i, 0, 1, 0); //left right
+			glTranslated(0, 0, (length / 2));
+			glRotatef(90, 0, 0, 1);
+			drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+			glPopMatrix();
+		}
+	}
+}
+
+void drawCurve2(float r, float g, float b, float length, GLuint texture, bool leftTrue = true, bool rightTrue = true, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	for (int i = -6; i < 40; i++) {
+		glPushMatrix();
+		glTranslated(0.01 * i, length * 0.32, length * 0.32);
+		glRotatef(90, 0, 0, 1);
+		drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+		glPopMatrix();
+	}
+
+
+	if (leftTrue) {
+		for (int i = 0; i > -6; i--) {
+			glPushMatrix();
+			glTranslated(-0.4, length * 0.32, length * 0.32);
+			glTranslated(0, 0, -(length / 2));
+			glRotatef(1 * i, 0, 1, 0); //left right
+			glTranslated(0, 0, (length / 2));
+			glRotatef(90, 0, 0, 1);
+			drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+			glPopMatrix();
+		}
+	}
+	if (rightTrue) {
+		for (int i = 0; i < 6; i++) {
+			glPushMatrix();
+			glTranslated(0.4, length * 0.32, length * 0.32);
+			glTranslated(0, 0, -(length / 2));
+			glRotatef(1 * i, 0, 1, 0); //left right
+			glTranslated(0, 0, (length / 2));
+			glRotatef(90, 0, 0, 1);
+			drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+			glPopMatrix();
+		}
+	}
+}
+
 void drawEntireHead() {
 	//head
 	drawSphereMetalStrips();
 
 	glPushMatrix();
-	glTranslated(0, -0.8, -0.3);
+	glTranslated(0, -0.7, -0.3);
 	drawSphereMetalStrips();
 	glPopMatrix();
 
@@ -1000,6 +1164,501 @@ void drawEntireHead() {
 	glPopMatrix();
 	glPopMatrix();
 
+}
+
+void drawCurvedBox(float r, float g, float b, float width, float height, float depth, GLuint texture, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	glColor3f(r, g, b);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	float scale = 0.8f;
+	//inset offsets
+	float xOffset = (width - width * scale) / 2;
+	float yOffset = (height - height * scale) / 2;
+	float zOffset = (depth - depth * scale) / 2;
+
+	//top & front
+	drawCurve(r, g, b, width, texture, true, false, flipTex, flipX, flipY, flipZ);
+
+	//left & front
+	glPushMatrix();
+	glRotatef(90, 0, 0, 1);
+	drawCurve(r, g, b, width, texture, false, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//left & top
+	glPushMatrix();
+	glRotatef(-90, 0, 1, 0);
+	drawCurve(r, g, b, width, texture, true, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//top & back
+	glPushMatrix();
+	glRotatef(-90, 1, 0, 0);
+	drawCurve(r, g, b, width, texture, true, false, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//left & front
+	glPushMatrix();
+	glRotatef(-90, 0, 1, 0);
+	glRotatef(90, 0, 0, 1);
+	drawCurve(r, g, b, width, texture, false, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//front
+	glNormal3f(0, 0, 1);
+	glPushMatrix();
+	glTranslated(xOffset, -yOffset, depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale, height * scale, texture);
+	glPopMatrix();
+
+	//back
+	glNormal3f(0, 0, -1);
+	glPushMatrix();
+	glTranslated(xOffset, -yOffset, -depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale, height * scale, texture);
+	glPopMatrix();
+
+	//left
+	glNormal3f(-1, 0, 0);
+	glPushMatrix();
+	glTranslated(-width / 2, -yOffset, -zOffset);
+	glRotated(90, 0, 1, 0);
+	drawRectangle3D(r, g, b, -depth / 2, height / 2, 0, depth * scale, height * scale, texture);
+	glPopMatrix();
+
+	//top
+	glNormal3f(0, 1, 0);
+	glPushMatrix();
+	glTranslated(xOffset, height / 2, -zOffset);
+	glRotated(90, 1, 0, 0);
+	drawRectangle3D(r, g, b, -width / 2, depth / 2, 0, width * scale, depth * scale, texture);
+	glPopMatrix();
+
+}
+
+void drawCurvedBox2(float r, float g, float b, float width, float height, float depth, GLuint texture, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	glColor3f(r, g, b);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	float scale = 0.8f;
+	//inset offsets
+	float xOffset = (width - width * scale) / 2;
+	float yOffset = (height - height * scale) / 2;
+	float zOffset = (depth - depth * scale) / 2;
+
+	//top & front
+	drawCurve2(r, g, b, width, texture, false, false, flipTex, flipX, flipY, flipZ);
+
+	//top & back
+	glPushMatrix();
+	glRotatef(-90, 1, 0, 0);
+	drawCurve2(r, g, b, width, texture, false, false, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//front
+	glNormal3f(0, 0, 1);
+	glPushMatrix();
+	glTranslated(xOffset + 0.33, -yOffset, depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale - 0.4, height * scale - 0.6, texture);
+	glPopMatrix();
+
+	//back
+	glNormal3f(0, 0, -1);
+	glPushMatrix();
+	glTranslated(xOffset + 0.33, -yOffset, -depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale - 0.4, height * scale, texture);
+	glPopMatrix();
+
+	//top
+	glNormal3f(0, 1, 0);
+	glPushMatrix();
+	glTranslated(xOffset + 0.33, height / 2, -zOffset);
+	glRotated(90, 1, 0, 0);
+	drawRectangle3D(r, g, b, -width / 2, depth / 2, 0, width * scale - 0.4, depth * scale, texture);
+	glPopMatrix();
+
+}
+
+void drawHeadShell(bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	//top left
+	glPushMatrix();
+	glTranslated(0, -0.5, -0.5);
+	glRotated(-testAngle2, 1, 1, 0);
+	glTranslated(0, 0.5, 0.5);
+
+	//main shell
+	glPushMatrix();
+	glTranslated(-0.4, 0.4, 0);
+	glScaled(1, 0.7, 1.6);
+	drawCurvedBox(1, 1, 1, 1, 1, 1, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+	//second shell
+	glPushMatrix();
+	glTranslated(-0.4, -0.1, 0);
+	glScaled(1, 0.7, 1.6);
+	glRotated(90, 0, 0, 1);
+	drawCurvedBox2(1, 1, 1, 1, 1, 1, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+	//eye corner triangle (right)
+	glPushMatrix();
+	glTranslated(0, 0.12, 0.8);
+	drawTriangle3D(1, 1, 1, 0, 0, 0, 0, -0.15, 0, -0.2, 0, 0, plasticTex);
+	glPopMatrix();
+	//eye corner triangle (left)
+	glPushMatrix();
+	glTranslated(-0.6, 0.12, 0.8);
+	glRotated(-180, 0, 1, 0);
+	drawTriangle3D(1, 1, 1, 0, 0, 0, 0, -0.15, 0, -0.2, 0, 0, plasticTex);
+	glPopMatrix();
+	//eyelid
+	glPushMatrix();
+	glTranslated(-0.3,-0.15, 0.8);
+	glRotated(-90, 1, 0, 0);
+	glScaled(1, 0.5, 1);
+	drawDonut(1, 0.7, 0.85, 0.3, 0.025, 180, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+	//eyebrown
+	glPushMatrix();
+	glTranslatef(-0.3, -0.2, 0.8);
+	glRotatef(60, 0, 0, 1);
+	glRotated(-90, 1, 0, 0);
+	glScaled(1, 0.5, 1);
+	drawDonut(0.545, 0, 0, 0.5, 0.05, 60, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//ear
+	glPushMatrix();
+	glTranslatef(-0.8, 1, -0.05);
+	glRotatef(-60, 0, 1, 0);
+	glRotatef(45, 0, 0, 1);
+	glScaled(2, 3, 2);
+	drawOval3D(1.0, 0.7, 0.85, 0, 0, 0, 0.07, 0.22, 0.15);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void drawCurve3(float r, float g, float b, float length, GLuint texture, bool leftTrue = true, bool rightTrue = true, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	for (int i = -39; i < 15; i++) {
+		glPushMatrix();
+		glTranslated(0.01 * i, length * 0.32, length * 0.32);
+		glRotatef(90, 0, 0, 1);
+		drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+		glPopMatrix();
+	}
+
+
+	if (leftTrue) {
+		for (int i = 0; i > -6; i--) {
+			glPushMatrix();
+			glTranslated(-0.4, length * 0.32, length * 0.32);
+			glTranslated(0, 0, -(length / 2));
+			glRotatef(1 * i, 0, 1, 0); //left right
+			glTranslated(0, 0, (length / 2));
+			glRotatef(90, 0, 0, 1);
+			drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+			glPopMatrix();
+		}
+	}
+	if (rightTrue) {
+		for (int i = 0; i < 6; i++) {
+			glPushMatrix();
+			glTranslated(0.4, length * 0.32, length * 0.32);
+			glTranslated(0, 0, -(length / 2));
+			glRotatef(1 * i, 0, 1, 0); //left right
+			glTranslated(0, 0, (length / 2));
+			glRotatef(90, 0, 0, 1);
+			drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
+			glPopMatrix();
+		}
+	}
+}
+
+void drawCurvedBox3(float r, float g, float b, float width, float height, float depth, GLuint texture, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	glColor3f(r, g, b);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	float scale = 0.8f;
+	//inset offsets
+	float xOffset = (width - width * scale) / 2;
+	float yOffset = (height - height * scale) / 2;
+	float zOffset = (depth - depth * scale) / 2;
+
+	//top & front
+	drawCurve3(r, g, b, width, texture, true, false, flipTex, flipX, flipY, flipZ);
+
+	//left & front
+	glPushMatrix();
+	glRotatef(90, 0, 0, 1);
+	drawCurve(r, g, b, width, texture, false, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//left & top
+	glPushMatrix();
+	glRotatef(-90, 0, 1, 0);
+	drawCurve(r, g, b, width, texture, true, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//top & back
+	glPushMatrix();
+	glRotatef(-90, 1, 0, 0);
+	drawCurve(r, g, b, width, texture, true, false, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//left & front
+	glPushMatrix();
+	glRotatef(-90, 0, 1, 0);
+	glRotatef(90, 0, 0, 1);
+	drawCurve(r, g, b, width, texture, false, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//front
+	glNormal3f(0, 0, 1);
+	glPushMatrix();
+	glTranslated(xOffset, -yOffset, depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale-0.25, height * scale, texture);
+	glPopMatrix();
+
+	//back
+	glNormal3f(0, 0, -1);
+	glPushMatrix();
+	glTranslated(xOffset, -yOffset, -depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale, height * scale, texture);
+	glPopMatrix();
+
+	//left
+	glNormal3f(-1, 0, 0);
+	glPushMatrix();
+	glTranslated(-width / 2, -yOffset, -zOffset);
+	glRotated(90, 0, 1, 0);
+	drawRectangle3D(r, g, b, -depth / 2, height / 2, 0, depth * scale, height * scale, texture);
+	glPopMatrix();
+
+	//top
+	glNormal3f(0, 1, 0);
+	glPushMatrix();
+	glTranslated(xOffset, height / 2, -zOffset);
+	glRotated(90, 1, 0, 0);
+	drawRectangle3D(r, g, b, -width / 2, depth / 2, 0, width * scale, depth * scale, texture);
+	glPopMatrix();
+
+}
+
+void drawHeadShell2(bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	glPushMatrix();
+	glTranslated(0, 0, -0.05);
+	glTranslated(0, -0.2, -0.5);
+	glRotated(-testAngle2, 1, 1, 0);
+	glTranslated(0, 0.5, 0.5);
+
+	//main shell
+	glPushMatrix();
+	glTranslated(-0.4, 0.6, 0);
+	glScaled(1, 1, 1.7);
+	drawCurvedBox3(1, 1, 1, 1, 1, 1, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+	//second shell
+	glPushMatrix();
+	glTranslated(-0.4, -0.1, 0);
+	glScaled(1, 1, 1.7);
+	glRotated(90, 0, 0, 1);
+	drawCurvedBox2(1, 1, 1, 1, 1, 1, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+	//eye corner triangle (center)
+	glPushMatrix();
+	glTranslated(0, 0.12, 0.845);
+	drawTriangle3D(1, 1, 1, -0.25, 0.12, 0, -0.25, -0.14, 0, -0.6, -0.14, 0, plasticTex);
+	glPopMatrix();
+	//eye corner triangle (left)
+	glPushMatrix();
+	glTranslated(-0.6, 0.12, 0.845);
+	glRotated(-180, 0, 1, 0);
+	drawTriangle3D(1, 1, 1, 0, 0.08, 0, 0, -0.25, 0, -0.35, 0.08, 0, plasticTex);
+	glPopMatrix();
+	//eyelid
+	glPushMatrix();
+	glTranslated(-0.3, -0.35, 0.85);
+	glRotated(30, 0, 0, 1);
+	glRotated(-90, 1, 0, 0);
+	glScaled(1, 0.5, 1);
+	drawDonut(1, 0.7, 0.85, 0.35, 0.025, 120, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//blush
+	glPushMatrix();
+	drawSphere(0.545, 0, 0, 1, -0.45, 0.25, 0.8, 0.2, plasticTex);
+	glPopMatrix();
+
+	//cheek
+	glPushMatrix();
+	glTranslated(-0.9, 0.7, 0);
+	glScaled(0.5, 0.9, 1.8);
+	drawSphere(1, 1, 1, 1, 0, 0, 0, 0.5, plasticTex);
+	glPopMatrix();
+
+	glPopMatrix();
+
+}
+
+void drawCurvedBox4(float r, float g, float b, float width, float height, float depth, GLuint texture, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	glColor3f(r, g, b);
+	GLfloat col[] = { r,g,b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	float scale = 0.8f;
+	//inset offsets
+	float xOffset = (width - width * scale) / 2;
+	float yOffset = (height - height * scale) / 2;
+	float zOffset = (depth - depth * scale) / 2;
+
+	//top & front
+	drawCurve(r, g, b, width, texture, true, false, flipTex, flipX, flipY, flipZ);
+
+	//left & front
+	glPushMatrix();
+	glRotatef(90, 0, 0, 1);
+	drawCurve(r, g, b, width, texture, false, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//left & top
+	glPushMatrix();
+	glRotatef(-90, 0, 1, 0);
+	drawCurve(r, g, b, width, texture, true, true, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//front
+	glNormal3f(0, 0, 1);
+	glPushMatrix();
+	glTranslated(xOffset, -yOffset, depth / 2);
+	drawRectangle3D(r, g, b, -width / 2, height / 2, 0, width * scale, height * scale, texture);
+	glPopMatrix();
+
+	//left
+	glNormal3f(-1, 0, 0);
+	glPushMatrix();
+	glTranslated(-width / 2, -yOffset, -zOffset);
+	glRotated(90, 0, 1, 0);
+	drawRectangle3D(r, g, b, -depth / 2, height / 2, 0, depth * scale, height * scale, texture);
+	glPopMatrix();
+
+	//top
+	glNormal3f(0, 1, 0);
+	glPushMatrix();
+	glTranslated(xOffset, height / 2, -zOffset);
+	glRotated(90, 1, 0, 0);
+	drawRectangle3D(r, g, b, -width / 2, depth / 2, 0, width * scale, depth * scale, texture);
+	glPopMatrix();
+
+}
+
+
+void drawOuterNose(bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	//top left
+	glPushMatrix();
+	glTranslated(-1, 1, 0);
+	glRotated(testAngle2, 1, 0, 0);
+	glRotated(-testAngle2, 0, 1, 0);
+	glTranslated(1, -1, 0);
+
+	//main shell
+	glPushMatrix();
+	glTranslated(-0.15, -0.55, 1.2);
+	glScaled(0.4, 0.5, 1.2);
+	drawCurvedBox4(1.0, 0.7, 0.85, 1, 1, 1, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//teeth
+	for (int i = 0; i < 5; i++) {
+		glPushMatrix();
+		glTranslated(-0.3, -0.7, 0.8 + (i * 0.2));
+		drawTeeth();
+		glPopMatrix();
+	}
+
+	glPopMatrix();
+}
+
+void drawOuterNose2(bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
+	//top left
+	glPushMatrix();
+	glTranslated(-1, 1, 0);
+	glRotated(-testAngle2, 1, 0, 0);
+	glRotated(-testAngle2, 0, 1, 0);
+	glTranslated(1, -1, 0);
+
+	//main shell
+	glPushMatrix();
+	glTranslated(-0.15, -0.55, 1.2);
+	glScaled(0.4, 0.5, 1.2);
+	drawCurvedBox4(1, 1, 1, 1, 1, 1, plasticTex, flipTex, flipX, flipY, flipZ);
+	glPopMatrix();
+
+	//teeth
+	for (int i = 0; i < 5; i++) {
+		glPushMatrix();
+		glTranslated(-0.3, -0.7, 0.8 + (i * 0.2));
+		drawTeeth();
+		glPopMatrix();
+	}
+
+	glPopMatrix();
+}
+
+
+void drawOuterShell() {
+	//upper left
+	drawHeadShell();
+
+	//upper right
+	glPushMatrix();
+	glScaled(-1, 1, 1);
+	glTranslated(0, 0, 0);
+	drawHeadShell(true, -1);
+	glPopMatrix();
+
+	//lower left
+	glPushMatrix();
+	glScaled(1, -1, 1);
+	drawHeadShell2(true, false, true);
+	glPopMatrix();
+
+	//lower right
+	glPushMatrix();
+	glScaled(-1, -1, 1);
+	drawHeadShell2(true, true, true);
+	glPopMatrix();
+
+	//nose (upper left)
+	glPushMatrix();
+	drawOuterNose();
+	glPopMatrix();
+
+	//nose (upper right)
+	glPushMatrix();
+	glScaled(-1, 1, 1);
+	drawOuterNose(true, -1, 1, 1);
+	glPopMatrix();
+
+	//nose (bottom left)
+	glPushMatrix();
+	glScaled(1, -0.8, 1);
+	glTranslated(0, 2, -0.3);
+	drawOuterNose2(true, 1, -1, 1);
+	glPopMatrix();
+
+	//nose (bottom right)
+	glPushMatrix();
+	glScaled(-1, -0.8, 1);
+	glTranslated(0, 2, -0.3);
+	drawOuterNose2(true, -1, -1, 1);
+	glPopMatrix();
 
 }
 
@@ -1773,6 +2432,7 @@ void display()
 		glPushMatrix();
 		//glScaled(0.5, 0.5, 0.5);
 		drawEntireHead();
+		drawOuterShell();
 		glPopMatrix();
 		break;
 
@@ -1817,6 +2477,8 @@ void display()
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
 		drawFuntimeFoxyHead();
+		drawEntireHead();
+
 
 		/*
 		glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
@@ -1885,11 +2547,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 
 	gluQuadricTexture(cone, GL_TRUE);
 	gluQuadricNormals(cone, GLU_SMOOTH);
+	gluQuadricTexture(cylinder, GL_TRUE);
+	gluQuadricNormals(cylinder, GLU_SMOOTH);
+
+	gluQuadricTexture(disk, GL_TRUE);
+	gluQuadricNormals(disk, GLU_SMOOTH);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 	LoadBMPTexture("metal.bmp", metalTex);
 	LoadBMPTexture("white.bmp", whiteTex);
 	LoadBMPTexture("teeth.bmp", teethTex);
+	LoadBMPTexture("plastic.bmp", plasticTex);
+	LoadBMPTexture("eye.bmp", eyeTex);
 
 	glEnable(GL_TEXTURE_2D);
 
