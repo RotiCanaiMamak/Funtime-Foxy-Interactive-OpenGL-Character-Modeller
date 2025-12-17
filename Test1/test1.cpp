@@ -37,6 +37,9 @@ float upperArmRotation = 0.0f;
 float lowerArmRotation = 0.0f;
 float upperArmRotation2 = 0.0f;
 bool faceOpen = false;
+float faceOpenAngle = 0.0f;
+float faceOpenSpeed = 0.25f;
+bool showJaw = true;
 
 //view perspective
 float rotatex = 0, rotatey = 0, rotatez = 0;
@@ -223,7 +226,8 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case 'K':
-			faceOpen = !faceOpen;
+			faceOpen = !faceOpen; 
+			showJaw = !showJaw;
 			break;
 
 		case 'Y':
@@ -1111,7 +1115,7 @@ void drawcube(float x, float y, float z) {
 
 
 //ch
-
+//test
 float degreeToRadian(int degree) {
 	return degree * (PI / 180.0f);
 }
@@ -1427,6 +1431,154 @@ void drawFaceQuarter(float r, float g, float b, float x, float y, float z, float
 	glPopMatrix();
 }
 
+void rotateUpperLeftFace(float angle)
+{
+	glPushMatrix();
+
+	// Move back from hinge
+	glTranslatef(0.05f, -0.175f, 0.0f);
+
+	// Rotate OUTWARD (around Y axis)
+	glRotatef(25, 0.0f, 1.0f, 0.0f);
+
+	// Move back from hinge
+	glTranslatef(-0.05f, 0.08f, 0.0f);
+
+	// Rotate outward (opposite direction of UL)
+	glRotatef(-angle, 0.0f, 1.0f, 0.0f);
+
+	glScalef(1.0f, 1.1f, 1.0f);
+
+	// Draw ONLY upper-left quarter
+	drawFaceQuarter(
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.5f, 0.0f,
+		0.4f,
+		2  
+	);
+
+	glPopMatrix();
+}
+
+void rotateUpperRightFace(float angle)
+{
+	glPushMatrix();
+
+	//glScaled(-1, 1, 1);
+
+	// Move back from hinge
+	glTranslatef(-0.025f, -0.085f, -0.025f);
+
+	// Rotate OUTWARD (around Y axis)
+	glRotatef(25, 0.0f, -1.0f, 0.0f);
+
+	glTranslatef(0.05f, 0.08f, 0.0f);
+
+	// Rotate outward (opposite direction of UL)
+	glRotatef(+angle, 0.0f, 1.0f, 0.0f);
+
+	// Undo hinge offset
+	glTranslatef(-0.05f, -0.08f, 0.0f);
+
+	glScalef(1.0f, 1.1f, 1.0f);
+
+	// Draw ONLY upper-right quarter
+	drawFaceQuarter(
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.5f, 0.0f,
+		0.4f,
+		1   // quarter 1 = upper-right
+	);
+
+	glPopMatrix();
+}
+
+void rotateLowerLeftFace(float angle)
+{
+	glPushMatrix();
+
+	glTranslatef(-0.08f, 0.97f, 0.0f);
+
+	glRotatef(180, 1, 0, 0);
+
+	// Move back from hinge
+	glTranslatef(0.05f, -0.08f, 0.0f);
+
+	// Rotate OUTWARD (around Y axis)
+	glRotatef(205, 0.0f, 1.0f, 0.0f);
+
+	// Move back from hinge
+	glTranslatef(-0.05f, 0.08f, 0.0f);
+
+	// Rotate outward (opposite direction of UL)
+	glRotatef(+angle, 0.0f, 1.0f, 0.0f);
+
+	// Draw ONLY upper-left quarter
+	drawFaceQuarter(
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.5f, 0.0f,
+		0.4f,
+		2   // quarter 2 = upper-left
+	);
+
+	glPopMatrix();
+}
+
+void rotateLowerRightFace(float angle)
+{
+	glPushMatrix();
+
+	glTranslatef(0.08f, 0.97f, 0.0f);
+
+	glRotatef(180, 1, 0, 0);
+
+	glTranslatef(-0.05f, -0.08f, 0.0f); 
+
+	glRotatef(245, 0.0f, 1.0f, 0.0f);
+
+	// Move back from hinge
+	glTranslatef(0.05f, 0.08f, 0.0f);  
+
+	glRotatef(-angle, 0.0f, 1.0f, 0.0f); 
+
+	drawFaceQuarter(
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.5f, 0.0f,
+		0.4f,
+		2   
+	);
+	glPopMatrix();
+}
+
+void rotateFaceQuarter(
+	float angle,
+	float axisX, float axisY,
+	int quarter
+);
+
+
+void drawLowerBackFace()
+{
+	glPushMatrix();
+
+	// Move to head position
+
+	glTranslatef(0.0f, 0.47f, 0.0f);
+	glRotatef(90, 1.0f, 0.0f, 0.0f);
+	// Flatten to look like a face plate
+
+
+	// Draw only FRONT hemisphere
+	drawHemisphere(
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		0.4f,
+		true
+	);
+
+	glPopMatrix();
+}
+
 //Draw Foxy Head
 void drawFuntimeFoxyHead() {
 	glPushMatrix();
@@ -1438,46 +1590,23 @@ void drawFuntimeFoxyHead() {
 	if (!faceOpen) {
 		// Closed state - draw complete front hemisphere
 		drawHemisphere(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, true);
+		glTranslatef(0, 0.5, 0.5);
+		glRotatef(270,1,0,0);
+		drawHemisphere(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, true);
 	}
 	else {
-		// Open state - draw 4 rotating quarters
-		float rotationAngle = 45.0f; // Adjust this for opening amount
+		float rotationAngle = faceOpenAngle;
 
-		// Top-right quarter
-		glPushMatrix();
-		glTranslatef(0.0f, 0.5f, 0.0f); // Move to head center
-		glRotatef(rotationAngle, 1, 1, 0); // Rotate around top-right axis
-		glTranslatef(0.0f, -0.5f, 0.0f); // Move back
-		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 1);
-		glPopMatrix();
-
-		// Top-left quarter  
-		glPushMatrix();
-		glTranslatef(0.0f, 0.5f, 0.0f);
-		glRotatef(rotationAngle, -1, 1, 0);
-		glTranslatef(0.0f, -0.5f, 0.0f);
-		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 2);
-		glPopMatrix();
-
-		// Bottom-left quarter
-		glPushMatrix();
-		glTranslatef(0.0f, 0.5f, 0.0f);
-		glRotatef(rotationAngle, -1, -1, 0);
-		glTranslatef(0.0f, -0.5f, 0.0f);
-		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 3);
-		glPopMatrix();
-
-		// Bottom-right quarter
-		glPushMatrix();
-		glTranslatef(0.0f, 0.5f, 0.0f);
-		glRotatef(rotationAngle, 1, -1, 0);
-		glTranslatef(0.0f, -0.5f, 0.0f);
-		drawFaceQuarter(1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.4f, 4);
-		glPopMatrix();
+		rotateUpperLeftFace(faceOpenAngle);
+		rotateUpperRightFace(faceOpenAngle);
+		rotateLowerLeftFace(faceOpenAngle);
+		rotateLowerRightFace(faceOpenAngle);
 	}
-
 	glPopMatrix();
 
+	
+	//LowerBack Head
+	drawLowerBackFace();
 
 	// Left cheek
 	glPushMatrix();
@@ -1515,38 +1644,40 @@ void drawFuntimeFoxyHead() {
 
 	// Left pink cheek ball
 	glPushMatrix();
-	glTranslatef(-0.25f, 0.35f, 0.28f);
-	drawSphere2(1.0f, 0.4f, 0.6f,
+	glTranslatef(-0.25f, 0.35f, 0.21f);   
+	drawSphere2(1.0f, 0.4f, 0.6f,         
 		0.0f, 0.0f, 0.0f,
 		0.08f);
 	glPopMatrix();
 
 	// Right pink cheek ball
 	glPushMatrix();
-	glTranslatef(0.25f, 0.35f, 0.28f);
+	glTranslatef(0.25f, 0.35f, 0.21f);
 	drawSphere2(1.0f, 0.4f, 0.6f,
 		0.0f, 0.0f, 0.0f,
 		0.08f);
 	glPopMatrix();
 
-	//Upper jaw
-	glPushMatrix();
-	drawSnout(
-		1.0f, 0.4f, 0.6f,   // colour
-		0.0f, 0.36f, 0.45f, // position
-		0.22f, 0.1f, 0.3f // size
-	);
-	glPopMatrix();
+	if (showJaw) {
+		//Upper jaw
+		glPushMatrix();
+		drawSnout(
+			1.0f, 0.4f, 0.6f,   // colour
+			0.0f, 0.36f, 0.45f, // position
+			0.22f, 0.1f, 0.3f // size
+		);
+		glPopMatrix();
 
-	//Lower jaw
-	glPushMatrix();
-	glRotatef(45, 1.0f, 0.0f, 0.0f);
-	drawSnout(
-		1.0f, 0.4f, 0.6f,   // colour
-		0.0f, 0.34f, 0.21f, // position
-		0.22f, 0.07f, 0.28f // size
-	);
-	glPopMatrix();
+		//Lower jaw
+		glPushMatrix();
+		glRotatef(90 * 0.6f, 1.0f, 0.0f, 0.0f);
+		drawSnout(
+			1.0f, 0.4f, 0.6f,   // colour
+			0.0f, 0.34f, 0.21f, // position
+			0.22f, 0.07f, 0.28f // size
+		);
+		glPopMatrix();
+	}
 }
 
 void DrawRobotArm()
@@ -1574,6 +1705,41 @@ void DrawRobotArm()
 	//DrawCubeLine(0, 0, 0);
 	glPopMatrix();
 
+
+	glPopMatrix();
+}
+
+void rotateFaceQuarter(float angle,float axisX, float axisY,int quarter) {
+	glPushMatrix();
+
+	// Move to head center
+	glTranslatef(0.0f, 0.5f, 0.0f);
+
+	float hx = 0.0f, hy = 0.0f;
+
+	if (quarter == 1) { hx = 0.1f; hy = 0.1f; }
+	if (quarter == 2) { hx = -0.1f; hy = 0.1f; }
+	if (quarter == 3) { hx = -0.1f; hy = -0.1f; }
+	if (quarter == 4) { hx = 0.1f; hy = -0.1f; }
+
+	glTranslatef(hx, hy, 0.0f);
+
+	// Rotate outward
+	glRotatef(angle, axisX, axisY, 1.0f);
+
+	// Undo hinge offset
+	glTranslatef(-hx, -hy, 0.0f);
+
+	// Move back
+	glTranslatef(0.0f, -0.5f, 0.0f);
+
+	// Draw the quarter
+	drawFaceQuarter(
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.5f, 0.0f,
+		0.4f,
+		quarter
+	);
 
 	glPopMatrix();
 }
@@ -1747,6 +1913,22 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+		}
+
+		// ===== FACE OPEN ANIMATION UPDATE =====
+		if (faceOpen) {
+			if (faceOpenAngle < 90.0f) {
+				faceOpenAngle += faceOpenSpeed;
+				if (faceOpenAngle > 90.0f)
+					faceOpenAngle = 90.0f;
+			}
+		}
+		else {
+			if (faceOpenAngle > 0.0f) {
+				faceOpenAngle -= faceOpenSpeed;
+				if (faceOpenAngle < 0.0f)
+					faceOpenAngle = 0.0f;
+			}
 		}
 
 		display();
