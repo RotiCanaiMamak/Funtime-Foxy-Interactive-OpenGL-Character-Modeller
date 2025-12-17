@@ -1714,7 +1714,7 @@ void drawFuntimeFoxyBody() {
 	glPopMatrix();
 
 	// Main body torso (pink)
-	//Low
+	//Down
 	glPushMatrix();
 	glColor3f(1.0f, 0.4f, 0.6f);
 	GLfloat pinkCol[] = { 1.0f, 0.4f, 0.6f, 1.0f };
@@ -1757,6 +1757,19 @@ void drawFuntimeFoxyBody() {
 	gluCylinder(cone, baseradius - 0.02f, topradius, 0.15, 40, 10);
 	glTranslatef(0.0, 0.0f, -0.05f);
 	gluCylinder(cone, 0.01, 0.26, 0.05, 40, 10);
+	glPopMatrix();
+
+	//Skirt (Pink)
+	glPushMatrix();
+	glColor3f(1.0f, 0.4f, 0.6f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
+	glScaled(1.12f, 0.27f, 1.65f);
+	// Rotate cylinder to stand upright 
+	glTranslatef(0, 0.0f, 0);
+	glRotatef(90, 1.0f, 0.0f, 0.0f);
+
+	gluCylinder(cone, topradius2, baseradius2 +0.01f, height2, 40, 10);
 	glPopMatrix();
 
 	// Bowtie
@@ -1875,7 +1888,112 @@ void drawFuntimeFoxyBody() {
 	glPopMatrix();
 	glPopMatrix();
 
+	//Grey Line
+	//1
+	glPushMatrix();
+		glColor3f(0.0f, 0.0f, 0.0f);
+		GLfloat lightblackCol[] = { 0.25f, 0.25f, 0.25f, 1.0f };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightblackCol);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightblackCol);
+		glTranslatef(0, -0.15, 0.246f);
+		glRotatef(-45, 1, 1.2, 1.0f);
+		glLineWidth(3.0f);
+		glBegin(GL_LINES);
+		glVertex3f(0.0f, 0.20f, 0.0f);
+		glVertex3f(0.0f, 0.4f, 0.0f);
+		glEnd();
+	glPopMatrix();
+
+	//2
+	glPushMatrix();
+		glScalef(-1.0f, 1.0f, 1.0f); 
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightblackCol);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightblackCol);
+		glTranslatef(0, -0.15f, 0.246f);
+		glRotatef(-45, 1, 1.2f, 1.0f);
+		glLineWidth(3.0f);
+		glBegin(GL_LINES);
+		glVertex3f(0.0f, 0.20f, 0.0f);
+		glVertex3f(0.0f, 0.4f, 0.0f);
+		glEnd();
+	glPopMatrix();
+
+	//3
+	glPushMatrix();
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightblackCol);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightblackCol);
+		glScaled(1,1,-1);
+		glTranslatef(0, -0.15, 0.246f);
+		glRotatef(-45, 1, 1.2, 1.0f);
+		glLineWidth(3.0f);
+		glBegin(GL_LINES);
+		glVertex3f(0.0f, 0.20f, 0.0f);
+		glVertex3f(0.0f, 0.4f, 0.0f);
+		glEnd();
+	glPopMatrix();
+
+	//4
+	glPushMatrix();
+		glScalef(-1.0f, 1.0f, 1.0f);
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightblackCol);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightblackCol);
+		glScaled(1, 1, -1);
+		glTranslatef(0, -0.15, 0.246f);
+		glRotatef(-45, 1, 1.2, 1.0f);
+		glLineWidth(3.0f);
+		glBegin(GL_LINES);
+		glVertex3f(0.0f, 0.20f, 0.0f);
+		glVertex3f(0.0f, 0.4f, 0.0f);
+		glEnd();
+	glPopMatrix();
+
+	// Joint 1 and 3
+	glPushMatrix();
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightblackCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightblackCol);
+
+	float r = 0.246f;
+	int segments = 32;
+	glTranslatef(0.016, 0.12, 0.03f);
+	glRotatef(45, 0, 1, 0);
+	glLineWidth(3.0f);
+	glBegin(GL_LINE_STRIP);
+	for (int i = 0; i <= segments; i++) {
+		float t = (1.0f * M_PI / 2.0f) * i / segments;
+		float z = r * cos(t) -0.05;
+		float x = r * sin(t);
+		glVertex3f(x, 0.05f, z);
+	}
+	glEnd();
+	glPopMatrix();
+
+	// Joint 2 and 4
+	glPushMatrix();
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightblackCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightblackCol);
+
+	glScalef(-1.0f, 1.0f, 1.0f);
+	glTranslatef(0.016f, 0.12f, 0.03f);
+
+	glRotatef(45, 0, 1, 0);
+
+	glLineWidth(3.0f);
+	glBegin(GL_LINE_STRIP);
+	for (int i = 0; i <= segments; i++) {
+		float t = (1.0f * M_PI / 2.0f) * i / segments;
+		float z = r * cos(t) - 0.05f;
+		float x = r * sin(t);
+		glVertex3f(x, 0.05f, z);
+	}
+	glEnd();
+	glPopMatrix();
 }
+
 void rotateFaceQuarter(float angle,float axisX, float axisY,int quarter) {
 	glPushMatrix();
 
