@@ -1692,6 +1692,190 @@ void drawFuntimeFoxyHead() {
 	}
 }
 
+//Draw Foxy Body
+void drawFuntimeFoxyBody() {
+	// Main body torso (white)
+	glPushMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	GLfloat col[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	// Rotate cylinder to stand upright
+	glRotatef(-90, 1.0f, 0.0f, 0.0f);
+
+	float baseradius = 0.28f;
+	float topradius = 0.2f;
+	float height = 0.55f;
+
+	gluCylinder(cone, topradius, baseradius, height, 40, 10);
+	glTranslatef(0.0, 0.0f, 0.55f);
+	gluCylinder(cone, 0.28, 0.01, 0.1, 40, 10);
+	glPopMatrix();
+
+	// Main body torso (pink)
+	//Low
+	glPushMatrix();
+	glColor3f(1.0f, 0.4f, 0.6f);
+	GLfloat pinkCol[] = { 1.0f, 0.4f, 0.6f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
+	glScaled(1.12f, 0.5f, 1.65f);
+	// Rotate cylinder to stand upright 
+	glRotatef(-90, 1.0f, 0.0f, 0.0f);
+	float baseradius2 = 0.16f;
+	float topradius2 = 0.13f;
+	float height2 = 0.55f;
+	gluCylinder(cone, topradius2, baseradius2, height2, 40, 10);
+	gluCylinder(cone, baseradius2 - 0.25f, topradius2, height2, 40, 10);
+	glPopMatrix();
+
+	//Up
+	glPushMatrix();
+	glColor3f(1.0f, 0.4f, 0.6f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
+	glScaled(1.12f, 0.5f, 1.65f);
+	// Rotate cylinder to stand upright 
+	glTranslatef(0, 1.1f, 0);
+	glRotatef(90, 1.0f, 0.0f, 0.0f);
+
+	gluCylinder(cone, topradius2, baseradius2, height2, 40, 10);
+	gluCylinder(cone, baseradius2 + 0.02f, topradius2 + 0.03f, height2, 40, 10);
+	glPopMatrix();
+
+	// Skirt (White)
+	glPushMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glTranslatef(0, -0.15f, 0);
+	glRotatef(-90, 1.0f, 0.0f, 0.0f);
+
+	// Torso shape
+	gluCylinder(cone, baseradius - 0.02f, topradius, 0.15, 40, 10);
+	glTranslatef(0.0, 0.0f, -0.05f);
+	gluCylinder(cone, 0.01, 0.26, 0.05, 40, 10);
+	glPopMatrix();
+
+	// Bowtie
+	//Center
+	glPushMatrix();
+	glColor3f(1.0f, 0.0f, 0.0f);
+	GLfloat redCol[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, redCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, redCol);
+	glTranslatef(0.0f, 0.52f, 0.32f);
+	// Rotate cylinder to stand upright 
+	drawSphere2(1.0f, 0.0f, 0.0f, 0, 0, 0, 0.045f);
+	glPopMatrix();
+
+	//Left part
+	glPushMatrix();
+	glTranslatef(-0.09f, 0.52f, 0.32f);
+	glScalef(1.3f, 0.75f, 0.35f);
+	glRotatef(10, 0, 1, 0);
+	drawSphere2(1.0f, 0.0f, 0.0f, 0, 0, 0, 0.07f);
+	glPopMatrix();
+
+	//Right part
+	glPushMatrix();
+	glTranslatef(0.09f, 0.52f, 0.32f);
+	glScalef(1.3f, 0.75f, 0.35f);
+	glRotatef(10, 0, 1, 0);
+	drawSphere2(1.0f, 0.0f, 0.0f, 0, 0, 0, 0.07f);
+	glPopMatrix();
+
+	//Speaker
+	glPushMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	GLfloat whiteCol[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, whiteCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, whiteCol);
+	glTranslatef(0.0f, 0.375f, 0.25f);
+	// Outer cylinder
+	gluCylinder(cone, 0.09f, 0.09f, 0.05f, 40, 10);
+	// Inner hole
+	glTranslatef(0.0f, 0.0f, 0.001f);
+	gluCylinder(cone, 0.07f, 0.07f, 0.05f, 40, 10);
+	glPopMatrix();
+
+	//Fill of the speaker colour
+	glPushMatrix();
+	glTranslatef(0.0f, 0.375f, 0.3f);
+	gluDisk(cone, 0.07f, 0.09f, 40, 1);
+	glPopMatrix();
+
+	// Speaker grille
+	glPushMatrix();
+
+	// Grey net
+	glColor3f(0.2f, 0.2f, 0.2f);
+	GLfloat lightdarkCol[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, lightdarkCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, lightdarkCol);
+
+	glTranslatef(0.0f, 0.375f, 0.285f);
+	glScalef(1.1f, 1.1f, 1.1f);
+	float innerR = 0.0f;
+	float outerR = 0.065f;
+	gluDisk(cone, innerR, outerR, 40, 1);
+
+	glLineWidth(1.5f);
+	glBegin(GL_LINES);
+	for (int i = 0; i < 24; i++) {
+		float angle = 2.0f * M_PI * i / 24.0f;
+		float x = outerR * cos(angle);
+		float y = outerR * sin(angle);
+
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(x, y, 0.0f);
+	}
+	glEnd();
+	glPopMatrix();
+	
+	//Net effect
+	glPushMatrix();
+	glColor3f(0.2f, 0.2f, 0.2f);
+	GLfloat darkCol[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, darkCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, darkCol);
+
+	glTranslatef(0.0f, 0.375f, 0.298f);
+	for (float r = 0.01f; r <= 0.065f; r += 0.01f) {
+		gluDisk(cone, r - 0.001f, r, 40, 1);
+	}
+	glPopMatrix();
+
+	// Black line
+	glPushMatrix();
+
+	// Black color
+	glColor3f(0.0f, 0.0f, 0.0f);
+	GLfloat blackCol[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, blackCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, blackCol);
+
+	glTranslatef(0.0f, -0.2f, 0.187f);
+	glRotatef(9.5 ,1, 0.0f, 0.0f);
+	glLineWidth(3.0f);
+
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.20f, 0.0f);   
+	glVertex3f(0.0f, 0.55f, 0.0f);   
+	glEnd();
+
+	glPushMatrix();
+	glTranslatef(0.0f, 0.0f, -0.01f);
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.67f, 0.0f);
+	glVertex3f(0.0f, 0.75f, 0.0f);
+	glEnd();
+	glPopMatrix();
+	glPopMatrix();
+
+}
 void rotateFaceQuarter(float angle,float axisX, float axisY,int quarter) {
 	glPushMatrix();
 
@@ -1798,8 +1982,11 @@ void display()
 		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
+		drawFuntimeFoxyBody();
+
+
 		glScalef(1.4,1.4,1.4);
-		drawFuntimeFoxyHead();
+		//drawFuntimeFoxyHead();
 
 		glTranslatef(0,0.6,0);
 		glScaled(0.3, 0.3, 0.3);
