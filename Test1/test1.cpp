@@ -3507,8 +3507,7 @@ void display()
 	case 1:
 		//manageRotations();
 
-		//glPushMatrix();
-		//glScaled(0.5, 0.5, 0.5);
+		glPushMatrix();
 		drawEntireHead();
 		drawOuterShell();
 		glPopMatrix();
@@ -3545,9 +3544,19 @@ void display()
 
 		glPopMatrix();
 
+		//Head
+		glPushMatrix();
+
+		glScalef(0.7f,0.7f,0.7f);
+		glTranslatef(0.0f,4.0f,0.0f);
+		drawEntireHead();
+		drawOuterShell();
+
+		glPopMatrix();
 
 		glPushMatrix();
 
+		//Body and Tail
 		glScaled(3, 3, 3);
 		drawFuntimeFoxyBody();
 
