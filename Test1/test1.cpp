@@ -46,7 +46,7 @@ bool showJaw = true;
 //view perspective
 float rotatex = 0, rotatey = 0, rotatez = 0;
 float rotateinc = 5;
-float translatex = 0, translatey = 0, translatez = 0;
+float translatex = 0, translatey = 0, translatez = -6;
 float translateinc = 0.1;
 bool changeView = true;
 
@@ -76,6 +76,7 @@ float isBlinked = 0;
 //rotation testing
 float testAngle = 0;
 float testAngle2 = 0;
+bool removeShell = false;
 
 //qf
 float rotateobjx, rotateobjy, rotateobjz, rotatearmx, rotatearmy, rotatearmz, rotatelowerarmx, rotatelowerarmy, rotatelowerarmz, rotatewristx, rotatewristy, rotatewristz, rotatethumbx, rotatethumby, rotatethumbz, rotateffx, rotateffy, rotateffz, rotatemfx, rotatemfy, rotatemfz, rotaterfx, rotaterfy, rotaterfz, rotatelfx, rotatelfy, rotatelfz, rotatefsttoe, rotatescdtoe, rotatethdtoe, rotatefourtoe, rotatethigh, rotatecalf, rotatefoot;
@@ -187,16 +188,34 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			translatez -= translateinc;
 			break;
 
+		case'0':
+			isBlinked--;
+			if (isBlinked < 0) {
+				isBlinked = 0;
+			}
+			testAngle--;
+			if (testAngle < 0) {
+				testAngle = 0;
+			}
+			testAngle2--;
+			if (testAngle < 0) {
+				testAngle = 0;
+			}
+			break;
+
 		case'P':
 			isBlinked++;
 			if (isBlinked > 8) {
-				isBlinked = 0;
+				isBlinked = 8;
 			}
 			testAngle++;
 			if (testAngle > 10) {
-				testAngle = 0;
+				testAngle = 10;
 			}
 			testAngle2++;
+			if (testAngle2 > 20) {
+				testAngle2 = 20;
+			}
 			break;
 
 			//ch
@@ -406,6 +425,8 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			changeView = !changeView;
 			break;
 
+		case 'Z':
+			removeShell = !removeShell;
 		}
 		break;
 
@@ -1724,7 +1745,6 @@ void drawCurvedBox4(float r, float g, float b, float width, float height, float 
 
 }
 
-
 void drawOuterNose(bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
 	//top left
 	glPushMatrix();
@@ -1754,10 +1774,10 @@ void drawOuterNose(bool flipTex = false, float flipX = 1, float flipY = 1, float
 void drawOuterNose2(bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
 	//top left
 	glPushMatrix();
-	glTranslated(-1, 1, 0);
+	glTranslated(0, 0, 0.5);
 	glRotated(-testAngle2, 1, 0, 0);
 	glRotated(-testAngle2, 0, 1, 0);
-	glTranslated(1, -1, 0);
+	glTranslated(0, 0, -0.5);
 
 	//main shell
 	glPushMatrix();
@@ -3547,10 +3567,12 @@ void display()
 		//Head
 		glPushMatrix();
 
-		glScalef(0.7f,0.7f,0.7f);
-		glTranslatef(0.0f,4.0f,0.0f);
+		glScalef(0.7f, 0.7f, 0.7f);
+		glTranslatef(0.0f, 4.0f, 0.0f);
 		drawEntireHead();
-		drawOuterShell();
+		if (!removeShell) {
+			drawOuterShell();
+		}
 
 		glPopMatrix();
 
