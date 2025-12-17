@@ -23,7 +23,7 @@ GLUquadricObj* shadow = gluNewQuadric();
 //cone
 GLUquadricObj* cone = gluNewQuadric();
 
-int renderNum = 1;
+int renderNum = 2;
 
 //For Arm
 // Rotation
@@ -46,7 +46,7 @@ float rotatex = 0, rotatey = 0, rotatez = 0;
 float rotateinc = 5;
 float translatex = 0, translatey = 0, translatez = 0;
 float translateinc = 0.1;
-bool changeView = false;
+bool changeView = true;
 
 // Mouse rotation
 bool isMouseDown = false;
@@ -71,6 +71,10 @@ float isBlinked = 0;
 
 //rotation testing
 float testAngle = 0;
+
+//qf
+float rotateobjx, rotateobjy, rotateobjz, rotatearmx, rotatearmy, rotatearmz, rotatelowerarmx, rotatelowerarmy, rotatelowerarmz, rotatewristx, rotatewristy, rotatewristz, rotatethumbx, rotatethumby, rotatethumbz, rotateffx, rotateffy, rotateffz, rotatemfx, rotatemfy, rotatemfz, rotaterfx, rotaterfy, rotaterfz, rotatelfx, rotatelfy, rotatelfz, rotatefsttoe, rotatescdtoe, rotatethdtoe, rotatefourtoe, rotatethigh, rotatecalf, rotatefoot;
+int keyset = 1;
 
 LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -190,42 +194,208 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 
 			//ch
-		case 'H':    // Lower arm up
-			lowerArmRotation += rotationSpeed;
-			if (lowerArmRotation > 90.0f) lowerArmRotation = 90.0f;
-			break;
+		//case 'H':    // Lower arm up
+		//	lowerArmRotation += rotationSpeed;
+		//	if (lowerArmRotation > 90.0f) lowerArmRotation = 90.0f;
+		//	break;
 
-		case 'N':  // Lower arm down
-			lowerArmRotation -= rotationSpeed;
-			if (lowerArmRotation < -90.0f) lowerArmRotation = -90.0f;
-			break;
+		//case 'N':  // Lower arm down
+		//	lowerArmRotation -= rotationSpeed;
+		//	if (lowerArmRotation < -90.0f) lowerArmRotation = -90.0f;
+		//	break;
 
-		case 'M': // Rotate whole arm right
-			upperArmRotation += rotationSpeed;
-			break;
+		//case 'M': // Rotate whole arm right
+		//	upperArmRotation += rotationSpeed;
+		//	break;
 
-		case 'B':  // Rotate whole arm left
-			upperArmRotation -= rotationSpeed;
-			break;
+		//case 'B':  // Rotate whole arm left
+		//	upperArmRotation -= rotationSpeed;
+		//	break;
 
-		case 'J':  // Rotate whole arm to left
-			upperArmRotation2 -= rotationSpeed;
-			break;
+		//case 'J':  // Rotate whole arm to left
+		//	upperArmRotation2 -= rotationSpeed;
+		//	break;
 
-		case 'G':  // Rotate whole arm to right
-			upperArmRotation2 += rotationSpeed;
-			break;
+		//case 'G':  // Rotate whole arm to right
+		//	upperArmRotation2 += rotationSpeed;
+		//	break;
 			//
+
+		case 'P':
+			switch (renderNum) {
+			case 1:
+				rotatearmx++;
+				break;
+			case 2:
+				rotatelowerarmx++;
+				break;
+			case 3:
+				rotatewristx++;
+				break;
+			case 4:
+				rotatethumbx++;
+				break;
+			case 5:
+				rotateffx++;
+				break;
+			case 6:
+				rotatemfx++;
+				break;
+			case 7:
+				rotaterfx++;
+				break;
+			case 8:
+				rotatelfx++;
+				break;
+			}
+			break;
+		case 'O':
+			switch (renderNum) {
+			case 1:
+				rotatearmx--;
+				break;
+			case 2:
+				rotatelowerarmx--;
+
+				break;
+			case 3:
+				rotatewristx--;
+				break;
+			case 4:
+				rotatethumbx--;
+				break;
+			case 5:
+				rotateffx--;
+				break;
+			case 6:
+				rotatemfx--;
+				break;
+			case 7:
+				rotaterfx--;
+				break;
+			case 8:
+				rotatelfx--;
+				break;
+			}
+			break;
+		case 'K':
+			switch (renderNum) {
+			case 1:
+				rotatearmy++;
+				break;
+			case 2:
+				rotatelowerarmy++;
+				break;
+			case 3:
+				rotatewristy++;
+				break;
+			case 4:
+				rotatethumby++;
+				break;
+			case 5:
+				rotateffy++;
+				break;
+			case 6:
+				rotatemfy++;
+				break;
+			case 7:
+				rotaterfy++;
+				break;
+			case 8:
+				rotatelfy++;
+				break;
+			}
+			break;
+		case 'L':
+			switch (renderNum) {
+			case 1:
+				rotatearmy--;
+				break;
+			case 2:
+				rotatelowerarmy--;
+				break;
+			case 3:
+				rotatewristy--;
+				break;
+			case 4:
+				rotatethumby--;
+				break;
+			case 5:
+				rotateffy--;
+				break;
+			case 6:
+				rotatemfy--;
+				break;
+			case 7:
+				rotaterfy--;
+				break;
+			case 8:
+				rotatelfy--;
+				break;
+			}
+			break;
+		case 'M':
+			switch (renderNum) {
+			case 1:
+				rotatearmz++;
+				break;
+			case 2:
+				rotatelowerarmz++;
+				break;
+			case 3:
+				rotatewristz++;
+				break;
+			case 4:
+				rotatethumbz++;
+				break;
+			case 5:
+				rotateffz++;
+				break;
+			case 6:
+				rotatemfz++;
+				break;
+			case 7:
+				rotaterfz++;
+				break;
+			case 8:
+				rotatelfz++;
+				break;
+			}
+			break;
+		case 'N':
+			switch (renderNum) {
+			case 1:
+				rotatearmz--;
+				break;
+			case 2:
+				rotatelowerarmz--;
+				break;
+			case 3:
+				rotatewristz--;
+				break;
+			case 4:
+				rotatethumbz--;
+				break;
+			case 5:
+				rotateffz--;
+				break;
+			case 6:
+				rotatemfz--;
+				break;
+			case 7:
+				rotaterfz--;
+				break;
+			case 8:
+				rotatelfz--;
+				break;
+			}
+			break;
 
 		case 'U':
 
 			break;
 
 		case 'I':
-
-			break;
-
-		case 'K':
 			faceOpen = !faceOpen; 
 			showJaw = !showJaw;
 			break;
@@ -1022,6 +1192,8 @@ void manageRotations() {
 
 	if (changeView) {
 		glFrustum(-0.16, 0.16, -0.09, 0.09, 0.1, 5);
+		gluLookAt(2, 1, 2, 0, 0, 0, 0, 1, 0);
+
 	}
 	if (!changeView) {
 		glOrtho(-1.6 * 2, 1.6 * 2, -0.9 * 2, 0.9 * 2, -2, 2);
@@ -1113,7 +1285,351 @@ void drawcube(float x, float y, float z) {
 
 }
 
+void drawfinger(bool left) {
+	glColor3f(1, 0.5, 0);
+	gluCylinder(cone, 0.03, 0.02, 0.05, 50, 50);
 
+	glPushMatrix();
+	glTranslatef(0, 0, 0.05);
+	gluSphere(sphere, 0.02, 100, 100);
+
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, 0, 0.05);
+
+	if (left) {
+		glRotatef(-45, 0, 1, 0);
+	}
+	else {
+		glRotatef(45, 0, 1, 0);
+	}
+
+	gluCylinder(cone, 0.02, 0.02, 0.05, 50, 50);
+
+	glPushMatrix();
+	glTranslatef(0, 0, 0.05);
+
+	gluSphere(sphere, 0.02, 100, 100);
+
+	//nails
+	glPushMatrix();
+	glTranslatef(0.01, -0.02, 0.01);
+	drawcube(0.01, 0.03, 0.02);
+
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void drawhand(bool left) {
+	glPushMatrix();
+	glRotatef(180, 0, 1, 0);
+	//glRotatef(rotateobjx, 1, 0, 0);
+	//glRotatef(rotateobjy, 0, 1, 0);
+	//glRotatef(rotateobjz, 0, 0, 1);
+
+	//shoulder joint
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+
+	gluSphere(sphere, 0.28, 100, 100);
+
+	//upper arm
+	glPushMatrix();
+	glRotatef(rotatearmx, 1, 0, 0);
+	glRotatef(rotatearmy, 0, 1, 0);
+	glRotatef(rotatearmz, 0, 0, 1);
+
+	glRotatef(90, 1, 0, 0);
+
+	glColor3f(1, 0, 1);
+	gluCylinder(cone, 0.3, 0.2, 1, 100, 100);
+
+	//elbow joint
+	glPushMatrix();
+	glTranslatef(0, 0, 1.1);
+	glColor3f(0, 0, 0);
+	gluSphere(sphere, 0.19, 100, 100);
+
+	//lower arm
+	glPushMatrix();
+	glTranslatef(0, 0, 0.1);
+	glRotatef(rotatelowerarmx, 1, 0, 1);
+	glRotatef(rotatelowerarmy, 0, 1, 0);
+	glRotatef(rotatelowerarmz, 0, 0, 1);
+
+	glColor3f(1, 0, 1);
+	gluCylinder(cone, 0.2, 0.11, 1, 100, 100);
+
+	//wrist
+	glPushMatrix();
+	glTranslatef(0, 0, 1.1);
+	glRotatef(rotatewristx, 1, 0, 0);
+	glRotatef(rotatewristy, 0, 1, 0);
+	glRotatef(rotatewristz, 0, 0, 1);
+
+	glColor3f(0, 0, 0);
+	gluSphere(sphere, 0.1, 100, 100);
+
+	//palm
+	glPushMatrix();
+	glTranslatef(-0.05, -0.1, 0.1);
+
+	glColor3f(0.5, 0.5, 0.5);
+	drawcube(0.1, 0.2, 0.15);
+
+	//thumb
+	glPushMatrix();
+	glTranslatef(0.05, 0, 0.08);
+	glRotatef(rotatethumbx, 1, 0, 0);
+	glRotatef(rotatethumby, 0, 1, 0);
+	glRotatef(rotatethumbz, 0, 0, 1);
+	glRotatef(45, 1, 0, 0);
+
+	drawfinger(left);
+
+	glPopMatrix();
+
+	//forefinger
+	glPushMatrix();
+	glTranslatef(0.05, 0.02, 0.15);
+	glRotatef(rotateffx, 1, 0, 0);
+	glRotatef(rotateffy, 0, 1, 0);
+	glRotatef(rotateffz, 0, 0, 1);
+
+	drawfinger(left);
+
+	glPopMatrix();
+
+	//middlefinger
+	glPushMatrix();
+	glTranslatef(0.05, 0.07, 0.15);
+	glRotatef(rotatemfx, 1, 0, 0);
+	glRotatef(rotatemfy, 0, 1, 0);
+	glRotatef(rotatemfz, 0, 0, 1);
+	drawfinger(left);
+
+	glPopMatrix();
+
+	//ringfinger
+	glPushMatrix();
+	glTranslatef(0.05, 0.12, 0.15);
+	glRotatef(rotaterfx, 1, 0, 0);
+	glRotatef(rotaterfy, 0, 1, 0);
+	glRotatef(rotaterfz, 0, 0, 1);
+	drawfinger(left);
+
+	glPopMatrix();
+
+	//smallfinger
+	glPushMatrix();
+	glTranslatef(0.05, 0.18, 0.15);
+	glRotatef(rotatelfx, 1, 0, 0);
+	glRotatef(rotatelfy, 0, 1, 0);
+	glRotatef(rotatelfz, 0, 0, 1);
+	drawfinger(left);
+
+	glPopMatrix();
+
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+
+}
+
+
+void drawrighttriangle(float x, float y, float z) {
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(0, 0);
+	glVertex3f(0 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 0);
+	glVertex3f(1 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 1);
+	glVertex3f(1 * x, 0 * y, 1 * z);
+	glTexCoord2f(0, 1);
+	glVertex3f(0 * x, 0 * y, 1 * z);
+	
+	glEnd();
+
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(0, 0);
+	glVertex3f(0 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 0);
+	glVertex3f(1 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 1);
+	glVertex3f(1 * x, 1 * y, 1 * z);
+	glTexCoord2f(0, 1);
+	glVertex3f(0 * x, 1 * y, 1 * z);
+
+	glEnd();
+
+	glBegin(GL_TRIANGLES);
+	glNormal3f(1,0,0);
+	glTexCoord2f(0, 0);
+	glVertex3f(0 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 0);
+	glVertex3f(0 * x, 0 * y, 1 * z);
+	glTexCoord2f(1, 1);
+	glVertex3f(0 * x, 1 * y, 1 * z);
+	glEnd();
+
+	glBegin(GL_TRIANGLES);
+	glNormal3f(-1, 0, 0);
+	glTexCoord2f(0, 0);
+	glVertex3f(1 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 0);
+	glVertex3f(1 * x, 0 * y, 1 * z);
+	glTexCoord2f(1, 1);
+	glVertex3f(1 * x, 1 * y, 1 * z);
+	glEnd();
+
+}
+
+void drawtoe() {
+	glPushMatrix();
+	glTranslatef(0.1, 0.1, -0.2);
+	glRotatef(180, 0, 0, 1);
+	//drawcube(0.15, 0.02, 0.2);
+	
+	//glPushMatrix();
+	//glTranslatef(0, 0, 0);
+	//glRotatef(-20, 1, 0, 0);
+
+	//drawcube(0.15, 0.05, 0.2);
+	drawrighttriangle(0.1,0.05,0.2);
+
+
+	//glPopMatrix();
+	glPopMatrix();
+
+}
+
+void drawdecoration(float x,float y,float z) {
+	glPushMatrix();
+	glTranslatef(x, y, z);
+
+	glColor3f(0, 0, 0.5);
+
+	gluSphere(sphere, 0.07, 100, 100);
+
+	glPopMatrix();
+}
+
+void drawleg(bool left) {
+	glPushMatrix();
+	
+	glColor3f(0, 0, 0);
+	gluSphere(sphere, 0.28, 100, 100);
+	
+	//thigh
+	glPushMatrix();
+	glRotatef(rotatethigh, 1, 0, 0);
+
+	glRotatef(90, 1, 0, 0);
+
+	glColor3f(1, 0, 1);
+	gluCylinder(cone, 0.3, 0.2, 0.5, 100, 100);
+
+	//knee
+	glPushMatrix();
+	glTranslatef(0, 0, 0.5);
+
+	glColor3f(0, 0, 0);
+	gluSphere(sphere, 0.2, 100, 100);
+
+	//calf
+	glPushMatrix();
+	glTranslatef(0, 0, 0.15);
+	glRotatef(rotatecalf, 1, 0, 0);
+
+	glColor3f(1, 0, 1);
+	gluCylinder(cone, 0.2, 0.25, 0.5, 100, 100);
+
+	glPushMatrix();
+	glTranslatef(0, 0, 0.5);
+	gluCylinder(cone, 0.25, 0.2, 0.5, 100, 100);
+	
+	//decoration
+	float leftlegx;
+	if (left) {
+		leftlegx = -0.1;
+	}
+	else {
+		leftlegx = 0.1;
+	}
+
+	drawdecoration(leftlegx, 0.2, 0);
+	drawdecoration(leftlegx, 0.2, 0.2);
+	drawdecoration(leftlegx,0.2,-0.2);
+
+	//ankle
+	glPushMatrix();
+	glTranslatef(0, 0, 0.5);
+
+	glColor3f(0, 0, 0);
+	gluSphere(sphere, 0.2, 100, 100);
+
+	//foot
+	glPushMatrix();
+	glTranslatef(-0.2, 0.4, 0.15);
+	glRotatef(rotatefoot, 1, 0, 0);
+	glRotatef(90, 1, 0, 0);
+	
+	drawcube(0.46, 0.1, 0.55);
+	
+	//fst toe
+	glPushMatrix();
+	glRotatef(rotatefsttoe, 0, 1, 0);
+
+	drawtoe();
+	glPopMatrix();
+
+	//scd toe
+	glPushMatrix();
+	glTranslatef(0.12, 0, 0);
+	glRotatef(rotatescdtoe, 0, 1, 0);
+
+	drawtoe();
+
+	glPopMatrix();
+
+	//third toe
+	glPushMatrix();
+	glTranslatef(0.24, 0, 0);
+	glRotatef(rotatethdtoe, 0, 1, 0);
+
+	drawtoe();
+
+	glPopMatrix();
+
+	//fourthtoe
+	glPushMatrix();
+	glTranslatef(0.36, 0, 0);
+	glRotatef(rotatefourtoe, 0, 1, 0);
+
+	drawtoe();
+
+	glPopMatrix();
+
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+
+}
+
+//ch
 //ch
 //test
 float degreeToRadian(int degree) {
@@ -2278,14 +2794,14 @@ void rotateFaceQuarter(float angle,float axisX, float axisY,int quarter) {
 
 void display()
 {
-	glClearColor(0.529, 0.808, 0.922, 1);
+	//glClearColor(0.529, 0.808, 0.922, 1);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//--------------------------------
 	//	OpenGL drawing
 	//--------------------------------
-	glShadeModel(GL_SMOOTH); //shader
+	//glShadeModel(GL_SMOOTH); //shader
 
 	// ======= FOR POINTS =======
 	//glPointSize(50);
@@ -2296,6 +2812,40 @@ void display()
 	//glLineWidth(5);
 	//glBegin(GL_LINE_LOOP);
 	// ==========================
+
+	glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
+
+
+	// Camera position
+	glTranslatef(translatex, translatey, -3.5f + translatez);
+
+	// Apply mouse rotation
+	glRotatef(mouseRotateX, 1, 0, 0);
+	glRotatef(mouseRotateY, 0, 1, 0);
+
+	// Apply keyboard rotation
+	glRotatef(rotatex, 1, 0, 0);
+	glRotatef(rotatey, 0, 1, 0);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Enable lighting
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	GLfloat lightPos[] = { 2.0f, 3.0f, 2.0f, 1.0f };
+	GLfloat lightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+	GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
 	switch (renderNum) {
 		//ZC
@@ -2310,42 +2860,70 @@ void display()
 
 
 	case 2: {
+		//manageRotations();
+		//left hand
+		glPushMatrix();
+		glTranslatef(-1.5, 0.5, 0);
+		drawhand(true);
 
+		glPopMatrix();
+
+		//right hand
+		glPushMatrix();
+		glTranslatef(1.5, 0.5, 0);
+		drawhand(false);
+
+		glPopMatrix();
+
+		//left leg
+		glPushMatrix();
+		glTranslatef(-1, -1, 0);
+		drawleg(true);
+
+		glPopMatrix();
+
+		//right leg
+		glPushMatrix();
+		glTranslatef(1, -1, 0);
+		drawleg(false);
+
+		glPopMatrix();
+		break;
 	}
 		  //CH
 	case 3: {
-		glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
+		//glMatrixMode(GL_PROJECTION);
+		//glLoadIdentity();
+		//gluPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
 
-		// Camera position
-		glTranslatef(translatex, translatey, -3.5f + translatez);
+		//// Camera position
+		//glTranslatef(translatex, translatey, -3.5f + translatez);
 
-		// Apply mouse rotation
-		glRotatef(mouseRotateX, 1, 0, 0);
-		glRotatef(mouseRotateY, 0, 1, 0);
+		//// Apply mouse rotation
+		//glRotatef(mouseRotateX, 1, 0, 0);
+		//glRotatef(mouseRotateY, 0, 1, 0);
 
-		// Apply keyboard rotation
-		glRotatef(rotatex, 1, 0, 0);
-		glRotatef(rotatey, 0, 1, 0);
+		//// Apply keyboard rotation
+		//glRotatef(rotatex, 1, 0, 0);
+		//glRotatef(rotatey, 0, 1, 0);
 
-		// Enable lighting
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
+		//// Enable lighting
+		//glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHT0);
 
-		GLfloat lightPos[] = { 2.0f, 3.0f, 2.0f, 1.0f };
-		GLfloat lightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-		GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+		//GLfloat lightPos[] = { 2.0f, 3.0f, 2.0f, 1.0f };
+		//GLfloat lightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+		//GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 
-		glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+		//glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+		//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+		//glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
 		drawFuntimeFoxyBody();
 
