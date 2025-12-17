@@ -50,7 +50,6 @@ bool isMouseDown = false;
 int lastMouseX = 0, lastMouseY = 0;
 float mouseRotateX = 0, mouseRotateY = 0;
 
-GLuint waterTex = 0;
 GLuint metalTex = 0;
 GLuint whiteTex = 0;
 
@@ -59,6 +58,9 @@ HBITMAP hBMP = NULL;
 
 //metal Tex
 float metalR = 0.7, metalY = 0.7, metalZ = 0.7;
+
+//eye
+float isBlinked = 0;
 
 LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -166,6 +168,13 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			translatez -= translateinc;
 			break;
 
+		case'P':
+			isBlinked++;
+			if (isBlinked > 8) {
+				isBlinked = 0;
+			}
+			break;
+
 			//ch
 		case 'H':    // Lower arm up
 			lowerArmRotation += rotationSpeed;
@@ -203,7 +212,7 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case 'K':
-			faceOpen = !faceOpen; 
+			faceOpen = !faceOpen;
 			break;
 
 		case 'Y':
@@ -475,6 +484,8 @@ void drawDonut(float r, float g, float b, float majorRadius, float minorRadius, 
 	//minorRadius: radius of the tube
 	//segments: number of segments around the major circle
 	//arcAngle: angle in degrees (360 = full donut, 180 = half, 90 = quarter)
+	float segmentsToDraw = 30;
+
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glColor3f(r, g, b);
 	GLfloat col[] = { r, g, b };
@@ -483,11 +494,11 @@ void drawDonut(float r, float g, float b, float majorRadius, float minorRadius, 
 
 	//convert arcAngle to radians and calculate how many segments to draw
 	float arcRadians = (arcAngle / 180.0f) * PI; //convert angle to radian (total angle to draw)
-	float angleStep = arcRadians / 40; //angle to turn for the next segment
+	float angleStep = arcRadians / 30; //angle to turn for the next segment
 
 	int tubeSegments = 20; //number of segments around the tube cross section (higher means rounder)
 
-	for (int i = 0; i < 40; i++) { //draw 1 segment between angle1 and angle2
+	for (int i = 0; i < segmentsToDraw; i++) { //draw 1 segment between angle1 and angle2
 		float angle1 = i * angleStep;
 		float angle2 = (i + 1) * angleStep;
 
@@ -495,12 +506,12 @@ void drawDonut(float r, float g, float b, float majorRadius, float minorRadius, 
 		float u1, u2;
 
 		if (flipTex) {
-			u1 = 1.0f - (float)i / 40;
-			u2 = 1.0f - (float)(i + 1) / 40;
+			u1 = 1.0f - (float)i / segmentsToDraw;
+			u2 = 1.0f - (float)(i + 1) / segmentsToDraw;
 		}
 		else {
-			u1 = (float)i / 40;
-			u2 = (float)(i + 1) / 40;
+			u1 = (float)i / segmentsToDraw;
+			u2 = (float)(i + 1) / segmentsToDraw;
 		}
 
 		glBegin(GL_QUAD_STRIP);
@@ -599,7 +610,7 @@ void drawQuadMetalStrips(int x, int y, int z) {
 	glRotated(95 * y, 0, 0, 1);
 	glRotated(0, 0, 1, 0);
 	glRotated(-18 * x, 1, 0, 0);
-	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 90,metalTex);
+	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 90, metalTex);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -607,7 +618,7 @@ void drawQuadMetalStrips(int x, int y, int z) {
 	glRotated(95 * y, 0, 0, 1);
 	glRotated(35, 0, 1, 0);
 	glRotated(-36 * x, 1, 0, 0);
-	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 120,  metalTex);
+	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 120, metalTex);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -623,7 +634,7 @@ void drawQuadMetalStrips(int x, int y, int z) {
 	glRotated(95 * y, 0, 0, 1);
 	glRotated(60, 0, 1, 0);
 	glRotated(-75 * x, 1, 0, 0);
-	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 110,  metalTex);
+	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 110, metalTex);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -631,7 +642,7 @@ void drawQuadMetalStrips(int x, int y, int z) {
 	glRotated(95 * y, 0, 0, 1);
 	glRotated(70, 0, 1, 0);
 	glRotated(-90 * x, 1, 0, 0);
-	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 70,  metalTex);
+	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 70, metalTex);
 	glPopMatrix();
 
 }
@@ -640,13 +651,13 @@ void drawSphereMetalStrips() {
 	//center (vertical)
 	glPushMatrix();
 	glRotated(90, 0, 0, 1);
-	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 360,  metalTex);
+	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 360, metalTex);
 	glPopMatrix();
 
 	//center (horizontal)
 	glPushMatrix();
 	glScaled(1, 1, 0.9);
-	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 360,  metalTex);
+	drawMetalStrips(metalR, metalY, metalZ, 0.5, 0.1, 360, metalTex);
 	glPopMatrix();
 
 	//top left
@@ -662,19 +673,24 @@ void drawSphereMetalStrips() {
 	drawQuadMetalStrips(1, -1, 1);
 }
 
-void drawEyeMetalStrips(float x, float y, float z, float tranX, float tranY, float tranZ, float direction, bool flipTex = false) {
+void drawEyeMetalStrips(float x, float y, float z, float tranX, float tranY, float tranZ, float direction, bool flipTex = false, bool isDown = false) {
 	glPushMatrix();
 	glTranslated(0.27 * x, 0.05 * y, 0);
 	glRotated(-15 * x + tranX, 0, 1, 0);
 	glRotated(10 * x * z + tranZ, 0, 0, 1);//left right
-	glTranslated(0, 0.01 * y, 0.04 * z); //translate back pivot point
+	glTranslated(0, 0.01 * y, 0.045 * z); //translate back pivot point
 	glRotated(-90 * y + tranY, 1, 0, 0); //up down
-	glTranslated(0, -0.01 * y, -0.04 * z); //translate pivot point
+	glTranslated(0, -0.01 * y, -0.045 * z); //translate pivot point
 
-	for (int i = -3; i < 9; i++) {
+	float end = 9;
+	if (isDown) {
+		end = 6;
+	}
+
+	for (int i = -3; i < end; i++) {
 		glPushMatrix();
 		glScaled(0.9, 1, 1);
-		glRotated(direction * 7.5 * i, 1, 0, 0);
+		glRotated(direction * 7.5 * (i + isBlinked), 1, 0, 0);
 		drawMetalStrips(metalR, metalY, metalZ, 0.3, 0.015, 160, metalTex, flipTex);
 		glPopMatrix();
 	}
@@ -691,7 +707,7 @@ void drawEye() {
 	//up
 	drawEyeMetalStrips(1, 1, 1, 0, 0, 0, 1);
 	//down
-	drawEyeMetalStrips(1, -1, 1, 0, 30, -30, -1);
+	drawEyeMetalStrips(1, -1, 1, 0, 0, -27, -1, false, true);
 	//back metal strips
 	glPushMatrix();
 	glTranslated(0.3, 0.05, 0.1);
@@ -740,7 +756,7 @@ void drawEye() {
 	//up
 	drawEyeMetalStrips(1, 1, 1, 0, 0, 0, 1, true);
 	//down
-	drawEyeMetalStrips(1, -1, 1, 0, 30, -30, -1, true);
+	drawEyeMetalStrips(1, -1, 1, 0, 0, -27, -1, false, true);
 	//back metal strips
 	glPushMatrix();
 	glTranslated(0.3, 0.05, 0.1);
@@ -788,7 +804,7 @@ void drawNose() {
 	glTranslated(0, -0.6, 0.2);
 
 	glPushMatrix();
-	drawCylinder(metalR,metalY,metalZ, 0, 0, 0, 0.05, 0.05, 1, metalTex);
+	drawCylinder(metalR, metalY, metalZ, 0, 0, 0, 0.05, 0.05, 1, metalTex);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -805,19 +821,19 @@ void drawNose() {
 
 	glPushMatrix();
 	glScaled(1, 1.2, 1.2);
-	glTranslated(0, -0.5, 0.35);
+	glTranslated(0, -0.5, 0.27);
 	glRotated(-90, 1, 0, 0);
 	drawDonut(metalR, metalY, metalZ, 0.2, 0.025, 180, metalTex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, -0.6, 0.54);
+	glTranslated(0, -0.6, 0.46);
 	glRotated(-90, 1, 0, 0);
 	drawDonut(metalR, metalY, metalZ, 0.2, 0.025, 180, metalTex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, -0.6, 0.64);
+	glTranslated(0, -0.6, 0.6);
 	glRotated(-90, 1, 0, 0);
 	drawDonut(metalR, metalY, metalZ, 0.2, 0.025, 180, metalTex);
 	glPopMatrix();
@@ -834,22 +850,30 @@ void drawNose() {
 	glPushMatrix();
 	glScaled(1.2, 0.7, 1);
 	glTranslated(-0.15, -0.9, 0.2);
-
-	glPushMatrix();
-	drawCylinder(metalR, metalY, metalZ, 0, 0, 0, 0.05, 0.05, 1, metalTex);
-	glPopMatrix();
-
+	drawCylinder(metalR, metalY, metalZ, 0, 0, 0, 0.05, 0.05, 0.88, metalTex);
 	glPopMatrix();
 
 	//right nose
 	glPushMatrix();
 	glScaled(1.2, 0.7, 1);
 	glTranslated(0.15, -0.9, 0.2);
-
-	glPushMatrix();
-	drawCylinder(metalR, metalY, metalZ, 0, 0, 0, 0.05, 0.05, 1, metalTex);
+	drawCylinder(metalR, metalY, metalZ, 0, 0, 0, 0.05, 0.05, 0.88, metalTex);
 	glPopMatrix();
 
+	//curve between left and right nose
+	glPushMatrix();
+	glScaled(1.2, 0.7, 1);
+	glTranslated(0, -0.9, 1.08);
+	glRotated(0, 0, 1, 0);
+	drawDonut(metalR, metalY, metalZ, 0.15, 0.05, 180, metalTex);
+	glPopMatrix();
+	//metal between center nose and curve
+	glPushMatrix();
+	glScaled(1.2, 0.7, 1);
+	glTranslated(0, -0.82, 0.95);
+	glRotated(-70, 1, 0, 0);
+	glRotated(-90, 0, 0, 1);
+	drawDonut(metalR, metalY, metalZ, 0.3, 0.05, 60, metalTex);
 	glPopMatrix();
 }
 
@@ -1335,10 +1359,10 @@ void drawFuntimeFoxyHead() {
 
 	// Left cheek
 	glPushMatrix();
-	glScalef(1,1,1.6f);
-	glTranslatef(-0.35f, 0.35f, 0.0f);  
-	glRotatef(135, 1, 0, 0);        
-	drawOval3D(1.0f, 1.0f, 1.0f,0.0f, 0.0f, 0.0f,0.15f, 0.18f, 0.08f);
+	glScalef(1, 1, 1.6f);
+	glTranslatef(-0.35f, 0.35f, 0.0f);
+	glRotatef(135, 1, 0, 0);
+	drawOval3D(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.15f, 0.18f, 0.08f);
 	glPopMatrix();
 
 	//Right Cheek
@@ -1346,12 +1370,12 @@ void drawFuntimeFoxyHead() {
 	glScalef(1, 1, 1.6f);
 	glTranslatef(0.35f, 0.35f, 0.0f);
 	glRotatef(135, 1, 0, 0);
-	drawOval3D(1.0f, 1.0f, 1.0f,0.0f, 0.0f, 0.0f,0.15f, 0.18f, 0.08f);
+	drawOval3D(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.15f, 0.18f, 0.08f);
 	glPopMatrix();
 
 	// Right ear
 	glPushMatrix();
-	glTranslatef(0.22f, 0.95f, -0.05f);  
+	glTranslatef(0.22f, 0.95f, -0.05f);
 	glRotatef(90, 0, 1, 0);
 	drawOval3D(1.0f, 0.7f, 0.85f,
 		0.0f, 0.0f, 0.0f,
@@ -1369,10 +1393,10 @@ void drawFuntimeFoxyHead() {
 
 	// Left pink cheek ball
 	glPushMatrix();
-	glTranslatef(-0.25f, 0.35f, 0.28f);   
-	drawSphere2(1.0f, 0.4f, 0.6f,         
+	glTranslatef(-0.25f, 0.35f, 0.28f);
+	drawSphere2(1.0f, 0.4f, 0.6f,
 		0.0f, 0.0f, 0.0f,
-		0.08f);                 
+		0.08f);
 	glPopMatrix();
 
 	// Right pink cheek ball
@@ -1394,7 +1418,7 @@ void drawFuntimeFoxyHead() {
 
 	//Lower jaw
 	glPushMatrix();
-	glRotatef(45,1.0f,0.0f,0.0f);
+	glRotatef(45, 1.0f, 0.0f, 0.0f);
 	drawSnout(
 		1.0f, 0.4f, 0.6f,   // colour
 		0.0f, 0.34f, 0.21f, // position
@@ -1458,6 +1482,9 @@ void display()
 	case 1:
 		manageRotations();
 
+		glPushMatrix();
+		//glScaled(0.5, 0.5, 0.5);
+
 		//head
 		drawSphereMetalStrips();
 
@@ -1482,16 +1509,20 @@ void display()
 		drawEye();
 
 		//nose section
+		glPushMatrix();
+		glScaled(1, 1, 1.3);
 		drawNose();
+		glPopMatrix();
 
+		glPopMatrix();
 		break;
 
-		
+
 	case 2: {
 
 	}
 
-	//CH
+		  //CH
 	case 3: {
 		glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
