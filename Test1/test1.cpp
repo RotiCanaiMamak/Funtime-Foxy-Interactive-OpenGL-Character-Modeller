@@ -221,7 +221,7 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		//	break;
 			//
 
-		case 'P':
+		case 'U':
 			switch (renderNum) {
 			case 1:
 				rotatearmx++;
@@ -389,10 +389,6 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 				rotatelfz--;
 				break;
 			}
-			break;
-
-		case 'U':
-
 			break;
 
 		case 'I':
@@ -2863,31 +2859,42 @@ void display()
 		//manageRotations();
 		//left hand
 		glPushMatrix();
-		glTranslatef(-1.5, 0.5, 0);
+		glTranslatef(-1, 1.5, 0);
 		drawhand(true);
 
 		glPopMatrix();
 
 		//right hand
 		glPushMatrix();
-		glTranslatef(1.5, 0.5, 0);
+		glTranslatef(1, 1.5, 0);
 		drawhand(false);
 
 		glPopMatrix();
 
 		//left leg
 		glPushMatrix();
-		glTranslatef(-1, -1, 0);
+		glTranslatef(-0.4, -0.6, 0);
 		drawleg(true);
 
 		glPopMatrix();
 
 		//right leg
 		glPushMatrix();
-		glTranslatef(1, -1, 0);
+		glTranslatef(0.4, -0.6, 0);
 		drawleg(false);
 
 		glPopMatrix();
+
+
+		glPushMatrix();
+
+		glScaled(3, 3, 3);
+		drawFuntimeFoxyBody();
+
+		drawFuntimeFoxyTail();
+
+		glPopMatrix();
+
 		break;
 	}
 		  //CH
@@ -2925,15 +2932,15 @@ void display()
 		//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 		//glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
-		drawFuntimeFoxyBody();
+		//drawFuntimeFoxyBody();
 
-		drawFuntimeFoxyTail();
+		//drawFuntimeFoxyTail();
 
-		glScalef(1.4,1.4,1.4);
+		//glScalef(1.4,1.4,1.4);
 		//drawFuntimeFoxyHead();
 
-		glTranslatef(0,0.6,0);
-		glScaled(0.3, 0.3, 0.3);
+		//glTranslatef(0,0.6,0);
+		//glScaled(0.3, 0.3, 0.3);
 		//drawEntireHead();
 	}
 		  break;
