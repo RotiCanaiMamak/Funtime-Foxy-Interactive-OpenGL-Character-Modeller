@@ -1994,6 +1994,253 @@ void drawFuntimeFoxyBody() {
 	glPopMatrix();
 }
 
+//Draw Foxy Tail
+void drawFuntimeFoxyTail()
+{
+	GLfloat tailCol[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+	glPushMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, tailCol);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, tailCol);
+
+	//Cone 1
+	glPushMatrix();
+	glScalef(1.5f,1.5f,1.5f);
+	glTranslatef(0.0f, 0.0f, -0.115f);
+	glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+	gluCylinder(cone,0.07f, 0.02f, 0.12f,30, 10);
+	glPopMatrix();
+
+	//Cone 2
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.0f, 0.0f, -0.27f);
+	glRotatef(3, 0, 1, 0);
+	gluCylinder(cone,0.07f, 0.02f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	//Cone 3
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.005f, 0.0f, -0.31f);
+	glRotatef(9, 0, 1, 0);
+	gluCylinder(cone, 0.12f, 0.0675f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	//Cone 4
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.005f, 0.0f, -0.35f);
+	glRotatef(9, 0, 1, 0);
+	gluCylinder(cone, 0.16f, 0.1075f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	//Cone 5
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.008f, 0.0f, -0.39f);
+	glRotatef(9, 0, 1, 0);
+	gluCylinder(cone, 0.22f, 0.1475f, 0.05f, 30, 10);
+	glPopMatrix();
+
+
+	//Cone 6 (Up start)
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.01f, -0.43f);
+	glRotatef(2, 1, 0, 0);  
+	glRotatef(9, 0, 1, 0);   
+	gluCylinder(cone, 0.18f, 0.21f, 0.05f, 30, 10);
+	glPopMatrix();
+
+
+	//Cone 7 
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.02f, -0.41f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.0f, -0.05f);
+	glRotatef(6, 1, 0, 0);
+	gluCylinder(cone, 0.15f, 0.196f, 0.045f, 30, 10);
+	glPopMatrix();
+
+	//Cone 8
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.03f, -0.39f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.0f, -0.095f);
+	glRotatef(12, 1, 0, 0);
+	gluCylinder(cone, 0.11f, 0.165f, 0.04f, 30, 10);
+	glPopMatrix();
+
+	//Cone 9 
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.04f, -0.37f); 
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.0f, -0.135f);  
+	glRotatef(18, 1, 0, 0);    
+	gluCylinder(cone, 0.075f, 0.12f, 0.035f, 30, 10);
+	glPopMatrix();
+
+	//Cone 10
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.05f, -0.35f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.0f, -0.17f);    
+	glRotatef(24, 1, 0, 0);            
+	gluCylinder(cone, 0.05f, 0.08f, 0.03f, 30, 10);
+	glPopMatrix();
+
+	//Cone 11
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.065f, -0.32f);   
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.0f, -0.195f); 
+	glRotatef(32, 1, 0, 0);   
+	gluCylinder(cone, 0.03f, 0.06f, 0.02f, 30, 10);
+	glPopMatrix();
+
+	//Cone 12
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.075f, -0.30f);  
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.0f, -0.22f);      
+	glRotatef(40, 1, 0, 0);             
+	gluCylinder(cone, 0.015f, 0.03f, 0.018f, 30, 10);
+	glPopMatrix();
+
+	//Cone 13 (Tip)
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.085f, -0.28f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.013f, -0.24f);
+	glRotatef(45, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	//Random on tails
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.01f, 0.085f, -0.28f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.013f, -0.24f);
+	glRotatef(45, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.01f, 0.075f, -0.30f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.013f, -0.24f);
+	glRotatef(45, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.01f, 0.075f, -0.30f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(9, 0, 1, 0);
+	glTranslatef(0.0f, 0.013f, -0.24f);
+	glRotatef(45, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.02f, 0.09f, -0.27f);
+	glRotatef(3, 1, 0, 0);
+	glRotatef(12, 0, 1, 0);
+	glTranslatef(0.0f, 0.015f, -0.23f);
+	glRotatef(50, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.02f, 0.065f, -0.32f);
+	glRotatef(1.5f, 1, 0, 0);
+	glRotatef(6, 0, 1, 0);
+	glTranslatef(0.0f, 0.012f, -0.22f);
+	glRotatef(38, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+
+
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.07f, 0.06f, -0.33f);
+	glRotatef(2.5f, 1, 0, 0);
+	glRotatef(18, 0, 1, 0);
+	glTranslatef(0.0f, 0.016f, -0.215f);
+	glRotatef(48, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.086f, 0.08f, -0.29f);
+	glRotatef(2.5f, 1, 0, 0);
+	glRotatef(11, 0, 1, 0);
+	glTranslatef(0.0f, 0.014f, -0.235f);
+	glRotatef(42, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.07f, 0.05f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(0.09f, 0.065f, -0.32f);
+	glRotatef(1.8f, 1, 0, 0);
+	glRotatef(7, 0, 1, 0);
+	glTranslatef(0.0f, 0.012f, -0.22f);
+	glRotatef(35, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.06f, 0.1f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.08f, 0.09f, -0.27f);
+	glRotatef(3.5f, 1, 0, 0);
+	glRotatef(16, 0, 1, 0);
+	glTranslatef(0.0f, 0.016f, -0.23f);
+	glRotatef(55, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.075f, 0.15f, 30, 10);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(1.5f, 1.5f, 1.5f);
+	glTranslatef(-0.05f, 0.07f, -0.31f);
+	glRotatef(2, 1, 0, 0);
+	glRotatef(-6, 0, 1, 0);
+	glTranslatef(0.0f, 0.013f, -0.24f);
+	glRotatef(47, 1, 0, 0);
+	gluCylinder(cone, 0.00f, 0.043f, 0.18f, 30, 10);
+	glPopMatrix();
+
+
+	glPopMatrix();
+}
+
 void rotateFaceQuarter(float angle,float axisX, float axisY,int quarter) {
 	glPushMatrix();
 
@@ -2102,6 +2349,7 @@ void display()
 
 		drawFuntimeFoxyBody();
 
+		drawFuntimeFoxyTail();
 
 		glScalef(1.4,1.4,1.4);
 		//drawFuntimeFoxyHead();
