@@ -25,7 +25,7 @@ GLUquadricObj* cone = gluNewQuadric();
 GLUquadricObj* cylinder = gluNewQuadric();
 GLUquadricObj* disk = gluNewQuadric();
 
-int renderNum = 2;
+int renderNum = 1;
 
 //For Arm
 // Rotation
@@ -61,6 +61,10 @@ GLuint whiteTex = 0;
 GLuint teethTex = 0;
 GLuint plasticTex = 0;
 GLuint eyeTex = 0;
+GLuint handTex = 0;
+GLuint legTex = 0;
+GLuint footTex = 0;
+GLuint blackdcTex = 0;
 
 BITMAP BMP;
 HBITMAP hBMP = NULL;
@@ -79,8 +83,12 @@ float testAngle2 = 0;
 bool removeShell = false;
 
 //qf
-float rotateobjx, rotateobjy, rotateobjz, rotatearmx, rotatearmy, rotatearmz, rotatelowerarmx, rotatelowerarmy, rotatelowerarmz, rotatewristx, rotatewristy, rotatewristz, rotatethumbx, rotatethumby, rotatethumbz, rotateffx, rotateffy, rotateffz, rotatemfx, rotatemfy, rotatemfz, rotaterfx, rotaterfy, rotaterfz, rotatelfx, rotatelfy, rotatelfz, rotatefsttoe, rotatescdtoe, rotatethdtoe, rotatefourtoe, rotatethigh, rotatecalf, rotatefoot;
+float rotateobjx, rotateobjy, rotateobjz, rotatearmx, rotatearmy, rotatearmz, rotatelowerarmx, rotatelowerarmy, rotatelowerarmz, rotatewristx, rotatewristy, rotatewristz, rotatethumbx, rotatethumby, rotatethumbz, rotateffx, rotateffy, rotateffz, rotatemfx, rotatemfy, rotatemfz, rotaterfx, rotaterfy, rotaterfz, rotatelfx, rotatelfy, rotatelfz, rotatefsttoe, rotatescdtoe, rotatethdtoe, rotatefourtoe, rotatethigh, rotatecalf, rotatefoot, rotatefooty;
+float lightx = 2, lighty = 3, lightz = 2;
 int keyset = 1;
+
+GLfloat pinkCol[] = { 1.0f, 0.4f, 0.6f, 1.0f };
+GLfloat col[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -144,6 +152,14 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			renderNum = 6;
 			break;
 
+		case '7':
+			renderNum = 7;
+			break;
+
+		case '8':
+			renderNum = 8;
+			break;
+
 		case VK_UP:
 			rotatex -= rotateinc;
 			break;
@@ -161,7 +177,10 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case VK_SPACE:
-
+			if (keyset > 3) {
+				keyset = 1;
+			}
+			keyset++;
 			break;
 
 		case 'W':
@@ -188,7 +207,26 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			translatez -= translateinc;
 			break;
 
-		case'0':
+		case 'G':
+			lightx++;
+			break;
+		case 'H':
+			lighty++;
+			break;
+		case 'J':
+			lightz++;
+			break;
+		case 'C':
+			lightx--;
+			break;
+		case 'V':
+			lighty--;
+			break;
+		case 'B':
+			lightz--;
+			break;
+
+		case'U':
 			isBlinked--;
 			if (isBlinked < 0) {
 				isBlinked = 0;
@@ -197,13 +235,24 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			if (testAngle < 0) {
 				testAngle = 0;
 			}
+
+			break;
+
+		case 'F':
 			testAngle2--;
-			if (testAngle < 0) {
-				testAngle = 0;
+			if (testAngle2 < 0) {
+				testAngle2 = 0;
 			}
 			break;
 
-		case'P':
+		case 'T':
+			testAngle2++;
+			if (testAngle2 > 20) {
+				testAngle2 = 20;
+			}
+			break;
+
+		case'I':
 			isBlinked++;
 			if (isBlinked > 8) {
 				isBlinked = 8;
@@ -212,216 +261,285 @@ LRESULT WINAPI WindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			if (testAngle > 10) {
 				testAngle = 10;
 			}
-			testAngle2++;
-			if (testAngle2 > 20) {
-				testAngle2 = 20;
-			}
+
 			break;
 
-			//ch
-		//case 'H':    // Lower arm up
-		//	lowerArmRotation += rotationSpeed;
-		//	if (lowerArmRotation > 90.0f) lowerArmRotation = 90.0f;
-		//	break;
-
-		//case 'N':  // Lower arm down
-		//	lowerArmRotation -= rotationSpeed;
-		//	if (lowerArmRotation < -90.0f) lowerArmRotation = -90.0f;
-		//	break;
-
-		//case 'M': // Rotate whole arm right
-		//	upperArmRotation += rotationSpeed;
-		//	break;
-
-		//case 'B':  // Rotate whole arm left
-		//	upperArmRotation -= rotationSpeed;
-		//	break;
-
-		//case 'J':  // Rotate whole arm to left
-		//	upperArmRotation2 -= rotationSpeed;
-		//	break;
-
-		//case 'G':  // Rotate whole arm to right
-		//	upperArmRotation2 += rotationSpeed;
-		//	break;
-			//
-
-		case 'U':
-			switch (renderNum) {
-			case 1:
-				rotatearmx++;
-				break;
-			case 2:
-				rotatelowerarmx++;
-				break;
-			case 3:
-				rotatewristx++;
-				break;
-			case 4:
-				rotatethumbx++;
-				break;
-			case 5:
-				rotateffx++;
-				break;
-			case 6:
-				rotatemfx++;
-				break;
-			case 7:
-				rotaterfx++;
-				break;
-			case 8:
-				rotatelfx++;
-				break;
+		case 'P':
+			if (keyset == 1) {
+				switch (renderNum) {
+				case 1:
+					rotatearmx++;
+					break;
+				case 2:
+					rotatelowerarmx++;
+					break;
+				case 3:
+					rotatewristx++;
+					break;
+				case 4:
+					rotatethumbx++;
+					break;
+				case 5:
+					rotateffx++;
+					break;
+				case 6:
+					rotatemfx++;
+					break;
+				case 7:
+					rotaterfx++;
+					break;
+				case 8:
+					rotatelfx++;
+					break;
+				}
+			}
+			else if (keyset == 2) {
+				switch (renderNum) {
+				case 1:
+					rotatethigh++;
+					break;
+				case 2:
+					rotatecalf++;
+					break;
+				case 3:
+					rotatefoot++;
+					break;
+				case 4:
+					rotatefsttoe++;
+					break;
+				case 5:
+					rotatescdtoe++;
+					break;
+				case 6:
+					rotatethdtoe++;
+					break;
+				case 7:
+					rotatefourtoe++;
+					break;
+				}
 			}
 			break;
 		case 'O':
-			switch (renderNum) {
-			case 1:
-				rotatearmx--;
-				break;
-			case 2:
-				rotatelowerarmx--;
+			if (keyset == 1) {
+				switch (renderNum) {
+				case 1:
+					rotatearmx--;
+					break;
+				case 2:
+					rotatelowerarmx--;
 
-				break;
-			case 3:
-				rotatewristx--;
-				break;
-			case 4:
-				rotatethumbx--;
-				break;
-			case 5:
-				rotateffx--;
-				break;
-			case 6:
-				rotatemfx--;
-				break;
-			case 7:
-				rotaterfx--;
-				break;
-			case 8:
-				rotatelfx--;
-				break;
+					break;
+				case 3:
+					rotatewristx--;
+					break;
+				case 4:
+					rotatethumbx--;
+					break;
+				case 5:
+					rotateffx--;
+					break;
+				case 6:
+					rotatemfx--;
+					break;
+				case 7:
+					rotaterfx--;
+					break;
+				case 8:
+					rotatelfx--;
+					break;
+				}
+			}
+			else if (keyset == 2) {
+				switch (renderNum) {
+				case 1:
+					rotatethigh--;
+					break;
+				case 2:
+					rotatecalf--;
+					break;
+				case 3:
+					rotatefoot--;
+					break;
+				case 4:
+					rotatefsttoe--;
+					break;
+				case 5:
+					rotatescdtoe--;
+					break;
+				case 6:
+					rotatethdtoe--;
+					break;
+				case 7:
+					rotatefourtoe--;
+					break;
+				}
 			}
 			break;
 		case 'K':
-			switch (renderNum) {
-			case 1:
-				rotatearmy++;
-				break;
-			case 2:
-				rotatelowerarmy++;
-				break;
-			case 3:
-				rotatewristy++;
-				break;
-			case 4:
-				rotatethumby++;
-				break;
-			case 5:
-				rotateffy++;
-				break;
-			case 6:
-				rotatemfy++;
-				break;
-			case 7:
-				rotaterfy++;
-				break;
-			case 8:
-				rotatelfy++;
-				break;
+			if (keyset == 1) {
+				switch (renderNum) {
+				case 1:
+					rotatearmy++;
+					break;
+				case 2:
+					rotatelowerarmy++;
+					break;
+				case 3:
+					rotatewristy++;
+					break;
+				case 4:
+					rotatethumby++;
+					break;
+				case 5:
+					rotateffy++;
+					break;
+				case 6:
+					rotatemfy++;
+					break;
+				case 7:
+					rotaterfy++;
+					break;
+				case 8:
+					rotatelfy++;
+					break;
+				}
+			}
+			else if (keyset == 2) {
+				switch (renderNum) {
+				case 1:
+					break;
+				case 2:
+					break;
+				case 3:
+					rotatefooty++;
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				case 6:
+					break;
+				case 7:
+					break;
+				}
 			}
 			break;
 		case 'L':
-			switch (renderNum) {
-			case 1:
-				rotatearmy--;
-				break;
-			case 2:
-				rotatelowerarmy--;
-				break;
-			case 3:
-				rotatewristy--;
-				break;
-			case 4:
-				rotatethumby--;
-				break;
-			case 5:
-				rotateffy--;
-				break;
-			case 6:
-				rotatemfy--;
-				break;
-			case 7:
-				rotaterfy--;
-				break;
-			case 8:
-				rotatelfy--;
-				break;
+			if (keyset == 1) {
+				switch (renderNum) {
+				case 1:
+					rotatearmy--;
+					break;
+				case 2:
+					rotatelowerarmy--;
+					break;
+				case 3:
+					rotatewristy--;
+					break;
+				case 4:
+					rotatethumby--;
+					break;
+				case 5:
+					rotateffy--;
+					break;
+				case 6:
+					rotatemfy--;
+					break;
+				case 7:
+					rotaterfy--;
+					break;
+				case 8:
+					rotatelfy--;
+					break;
+				}
+			}
+			else if (keyset == 2) {
+				switch (renderNum) {
+				case 1:
+					break;
+				case 2:
+					break;
+				case 3:
+					rotatefooty--;
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				case 6:
+					break;
+				case 7:
+					break;
+				}
 			}
 			break;
 		case 'M':
-			switch (renderNum) {
-			case 1:
-				rotatearmz++;
-				break;
-			case 2:
-				rotatelowerarmz++;
-				break;
-			case 3:
-				rotatewristz++;
-				break;
-			case 4:
-				rotatethumbz++;
-				break;
-			case 5:
-				rotateffz++;
-				break;
-			case 6:
-				rotatemfz++;
-				break;
-			case 7:
-				rotaterfz++;
-				break;
-			case 8:
-				rotatelfz++;
-				break;
+			if (keyset == 1) {
+				switch (renderNum) {
+				case 1:
+					rotatearmz++;
+					break;
+				case 2:
+					rotatelowerarmz++;
+					break;
+				case 3:
+					rotatewristz++;
+					break;
+				case 4:
+					rotatethumbz++;
+					break;
+				case 5:
+					rotateffz++;
+					break;
+				case 6:
+					rotatemfz++;
+					break;
+				case 7:
+					rotaterfz++;
+					break;
+				case 8:
+					rotatelfz++;
+					break;
+				}
 			}
 			break;
 		case 'N':
-			switch (renderNum) {
-			case 1:
-				rotatearmz--;
-				break;
-			case 2:
-				rotatelowerarmz--;
-				break;
-			case 3:
-				rotatewristz--;
-				break;
-			case 4:
-				rotatethumbz--;
-				break;
-			case 5:
-				rotateffz--;
-				break;
-			case 6:
-				rotatemfz--;
-				break;
-			case 7:
-				rotaterfz--;
-				break;
-			case 8:
-				rotatelfz--;
-				break;
+			if (keyset == 1) {
+				switch (renderNum) {
+				case 1:
+					rotatearmz--;
+					break;
+				case 2:
+					rotatelowerarmz--;
+					break;
+				case 3:
+					rotatewristz--;
+					break;
+				case 4:
+					rotatethumbz--;
+					break;
+				case 5:
+					rotateffz--;
+					break;
+				case 6:
+					rotatemfz--;
+					break;
+				case 7:
+					rotaterfz--;
+					break;
+				case 8:
+					rotatelfz--;
+					break;
+				}
 			}
 			break;
 
-		case 'I':
+		case 'Y':
 			faceOpen = !faceOpen; 
 			showJaw = !showJaw;
 			break;
 
-		case 'Y':
+		case 'X':
 			changeView = !changeView;
 			break;
 
@@ -665,6 +783,8 @@ void shadowSphere(float r, float g, float b, float planeDistance, float sphereX,
 }
 
 void drawSphere(float r, float g, float b, float alpha, float x, float y, float z, float rad, GLuint texture) {
+	glEnable(GL_TEXTURE_2D);
+
 	glColor4f(r, g, b, alpha);
 	GLfloat col[] = { r,g,b };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
@@ -675,6 +795,8 @@ void drawSphere(float r, float g, float b, float alpha, float x, float y, float 
 	glTranslated(x, y, z);
 	gluSphere(sphere, rad, 100, 100);
 	glPopMatrix();
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 void drawCylinder(float r, float g, float b, float x, float y, float z, float baseRad, float topRad, float height, GLuint texture) {
@@ -1222,9 +1344,9 @@ void drawNose() {
 }
 
 void drawCurve(float r, float g, float b, float length, GLuint texture, bool leftTrue = true, bool rightTrue = true, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
-	for (int i = -39; i < 40; i++) {
+	for (int i = -19; i < 20; i++) {
 		glPushMatrix();
-		glTranslated(0.01 * i, length * 0.32, length * 0.32);
+		glTranslated(0.02 * i, length * 0.32, length * 0.32);
 		glRotatef(90, 0, 0, 1);
 		drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
 		glPopMatrix();
@@ -1258,9 +1380,9 @@ void drawCurve(float r, float g, float b, float length, GLuint texture, bool lef
 }
 
 void drawCurve2(float r, float g, float b, float length, GLuint texture, bool leftTrue = true, bool rightTrue = true, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
-	for (int i = -6; i < 40; i++) {
+	for (int i = -3; i < 20; i++) {
 		glPushMatrix();
-		glTranslated(0.01 * i, length * 0.32, length * 0.32);
+		glTranslated(0.02 * i, length * 0.32, length * 0.32);
 		glRotatef(90, 0, 0, 1);
 		drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
 		glPopMatrix();
@@ -1530,9 +1652,9 @@ void drawHeadShell(bool flipTex = false, float flipX = 1, float flipY = 1, float
 }
 
 void drawCurve3(float r, float g, float b, float length, GLuint texture, bool leftTrue = true, bool rightTrue = true, bool flipTex = false, float flipX = 1, float flipY = 1, float flipZ = 1) {
-	for (int i = -39; i < 15; i++) {
+	for (int i = -19; i < 7; i++) {
 		glPushMatrix();
-		glTranslated(0.01 * i, length * 0.32, length * 0.32);
+		glTranslated(0.02 * i, length * 0.32, length * 0.32);
 		glRotatef(90, 0, 0, 1);
 		drawDonutLow(r, g, b, 0.2 * length, 0.01, 100, texture, flipTex, flipX, flipY, flipZ);
 		glPopMatrix();
@@ -1885,7 +2007,7 @@ void manageRotations() {
 void drawcubeface(float(&arr)[4][3], float colorarr[3], float x, float y, float z) {
 	glBegin(GL_QUADS);
 
-	glColor3f(colorarr[0], colorarr[1], colorarr[2]);
+	//glColor3f(colorarr[0], colorarr[1], colorarr[2]);
 	glTexCoord2f(0, 0);
 	glVertex3f(arr[0][0] * x, arr[0][1] * y, arr[0][2] * z);
 	glTexCoord2f(1, 0);
@@ -1990,8 +2112,16 @@ void drawfinger(bool left) {
 	//nails
 	glPushMatrix();
 	glTranslatef(0.01, -0.02, 0.01);
+	if (!left) {
+		glTranslatef(-0.03, 0, 0);
+	}
+
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol );
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
 	drawcube(0.01, 0.03, 0.02);
 
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
@@ -2018,8 +2148,10 @@ void drawhand(bool left) {
 
 	glRotatef(90, 1, 0, 0);
 
-	glColor3f(1, 0, 1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, handTex);
 	gluCylinder(cone, 0.3, 0.2, 1, 100, 100);
+	glDisable(GL_TEXTURE_2D);
 
 	//elbow joint
 	glPushMatrix();
@@ -2034,8 +2166,10 @@ void drawhand(bool left) {
 	glRotatef(rotatelowerarmy, 0, 1, 0);
 	glRotatef(rotatelowerarmz, 0, 0, 1);
 
-	glColor3f(1, 0, 1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, handTex);
 	gluCylinder(cone, 0.2, 0.11, 1, 100, 100);
+	glDisable(GL_TEXTURE_2D);
 
 	//wrist
 	glPushMatrix();
@@ -2051,7 +2185,8 @@ void drawhand(bool left) {
 	glPushMatrix();
 	glTranslatef(-0.05, -0.1, 0.1);
 
-	glColor3f(0.5, 0.5, 0.5);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
 	drawcube(0.1, 0.2, 0.15);
 
 	//thumb
@@ -2061,6 +2196,8 @@ void drawhand(bool left) {
 	glRotatef(rotatethumby, 0, 1, 0);
 	glRotatef(rotatethumbz, 0, 0, 1);
 	glRotatef(45, 1, 0, 0);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
 
 	drawfinger(left);
 
@@ -2118,22 +2255,11 @@ void drawhand(bool left) {
 
 }
 
-
 void drawrighttriangle(float x, float y, float z) {
-	glBegin(GL_QUADS);
-
-	glTexCoord2f(0, 0);
-	glVertex3f(0 * x, 0 * y, 0 * z);
-	glTexCoord2f(1, 0);
-	glVertex3f(1 * x, 0 * y, 0 * z);
-	glTexCoord2f(1, 1);
-	glVertex3f(1 * x, 0 * y, 1 * z);
-	glTexCoord2f(0, 1);
-	glVertex3f(0 * x, 0 * y, 1 * z);
-	
-	glEnd();
 
 	glBegin(GL_QUADS);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
 
 	glTexCoord2f(0, 0);
 	glVertex3f(0 * x, 0 * y, 0 * z);
@@ -2144,6 +2270,21 @@ void drawrighttriangle(float x, float y, float z) {
 	glTexCoord2f(0, 1);
 	glVertex3f(0 * x, 1 * y, 1 * z);
 
+	glEnd();
+
+	glBegin(GL_QUADS);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
+
+	glTexCoord2f(0, 0);
+	glVertex3f(0 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 0);
+	glVertex3f(1 * x, 0 * y, 0 * z);
+	glTexCoord2f(1, 1);
+	glVertex3f(1 * x, 0 * y, 1 * z);
+	glTexCoord2f(0, 1);
+	glVertex3f(0 * x, 0 * y, 1 * z);
+	
 	glEnd();
 
 	glBegin(GL_TRIANGLES);
@@ -2191,9 +2332,11 @@ void drawdecoration(float x,float y,float z) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
 
-	glColor3f(0, 0, 0.5);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, blackdcTex);
 
 	gluSphere(sphere, 0.07, 100, 100);
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
@@ -2210,8 +2353,10 @@ void drawleg(bool left) {
 
 	glRotatef(90, 1, 0, 0);
 
-	glColor3f(1, 0, 1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, legTex);
 	gluCylinder(cone, 0.3, 0.2, 0.5, 100, 100);
+	glDisable(GL_TEXTURE_2D);
 
 	//knee
 	glPushMatrix();
@@ -2225,13 +2370,15 @@ void drawleg(bool left) {
 	glTranslatef(0, 0, 0.15);
 	glRotatef(rotatecalf, 1, 0, 0);
 
-	glColor3f(1, 0, 1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, legTex);
 	gluCylinder(cone, 0.2, 0.25, 0.5, 100, 100);
 
 	glPushMatrix();
 	glTranslatef(0, 0, 0.5);
 	gluCylinder(cone, 0.25, 0.2, 0.5, 100, 100);
-	
+	glDisable(GL_TEXTURE_2D);
+
 	//decoration
 	float leftlegx;
 	if (left) {
@@ -2254,12 +2401,16 @@ void drawleg(bool left) {
 
 	//foot
 	glPushMatrix();
-	glTranslatef(-0.2, 0.4, 0.15);
+	glTranslatef(-0.22, 0.4, 0.15);
 	glRotatef(rotatefoot, 1, 0, 0);
+	glRotatef(rotatefooty, 0, 1, 0);
 	glRotatef(90, 1, 0, 0);
-	
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, footTex);
 	drawcube(0.46, 0.1, 0.55);
-	
+	glDisable(GL_TEXTURE_2D);
+
 	//fst toe
 	glPushMatrix();
 	glRotatef(rotatefsttoe, 0, 1, 0);
@@ -2888,7 +3039,6 @@ void drawFuntimeFoxyBody() {
 	// Main body torso (white)
 	glPushMatrix();
 	glColor3f(1.0f, 1.0f, 1.0f);
-	GLfloat col[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, col);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, col);
 
@@ -2908,7 +3058,6 @@ void drawFuntimeFoxyBody() {
 	//Down
 	glPushMatrix();
 	glColor3f(1.0f, 0.4f, 0.6f);
-	GLfloat pinkCol[] = { 1.0f, 0.4f, 0.6f, 1.0f };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pinkCol);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pinkCol);
 	glScaled(1.12f, 0.5f, 1.65f);
@@ -3493,8 +3642,14 @@ void display()
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
 
+	if (!changeView) {
+		gluPerspective(20.0f, 16.0f / 9.0f, 0.1f, 50.0f);
+
+	}
+	else{
+		glOrtho(-1.6 * 4, 1.6 * 4, -0.9 * 4, 0.9 * 4, -2, 50);
+	}
 
 	// Camera position
 	glTranslatef(translatex, translatey, -3.5f + translatez);
@@ -3514,7 +3669,7 @@ void display()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	GLfloat lightPos[] = { 2.0f, 3.0f, 2.0f, 1.0f };
+	GLfloat lightPos[] = { lightx, lighty, lightz, 1 };
 	GLfloat lightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
 	GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 
@@ -3522,19 +3677,19 @@ void display()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 
-	switch (renderNum) {
-		//ZC
-	case 1:
-		//manageRotations();
+	//switch (renderNum) {
+	//	//ZC
+	//case 1:
+	//	//manageRotations();
 
-		glPushMatrix();
-		drawEntireHead();
-		drawOuterShell();
-		glPopMatrix();
-		break;
+	//	glPushMatrix();
+	//	drawEntireHead();
+	//	drawOuterShell();
+	//	glPopMatrix();
+	//	break;
 
 
-	case 2: {
+	//case 2: {
 		//manageRotations();
 		//left hand
 		glPushMatrix();
@@ -3586,10 +3741,10 @@ void display()
 
 		glPopMatrix();
 
-		break;
-	}
-		  //CH
-	case 3: {
+	//	break;
+	//}
+	//	  //CH
+	//case 3: {
 		//glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -3627,16 +3782,16 @@ void display()
 
 		//drawFuntimeFoxyTail();
 
-		drawFuntimeFoxyHead();
-		drawEntireHead();
+	//	drawFuntimeFoxyHead();
+	//	drawEntireHead();
 
 
-		//glTranslatef(0,0.6,0);
-		//glScaled(0.3, 0.3, 0.3);
-		//drawEntireHead();
-	}
-		  break;
-	}
+	//	//glTranslatef(0,0.6,0);
+	//	//glScaled(0.3, 0.3, 0.3);
+	//	//drawEntireHead();
+	//}
+	//	  break;
+	//}
 
 
 
@@ -3705,6 +3860,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 	LoadBMPTexture("teeth.bmp", teethTex);
 	LoadBMPTexture("plastic.bmp", plasticTex);
 	LoadBMPTexture("eye.bmp", eyeTex);
+	LoadBMPTexture("hand.bmp", handTex);
+	LoadBMPTexture("leg.bmp", legTex);
+	LoadBMPTexture("foot.bmp", footTex);
+	LoadBMPTexture("blackdc.bmp", blackdcTex);
 
 	glEnable(GL_TEXTURE_2D);
 
