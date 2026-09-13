@@ -63,26 +63,6 @@ The project uses custom geometry, lighting, textures, hierarchical transformatio
 | `M` / `N` | Rotate selected arm joint on the Z axis |
 | `Esc` | Exit the application |
 
-## Project Structure
-
-```text
-Test1/
-├── Test1.sln               # Visual Studio solution
-├── Test1/
-│   ├── test1.cpp           # Main application and rendering code
-│   ├── Test1.vcxproj       # Visual Studio C++ project file
-│   ├── metal.bmp           # Metal texture
-│   ├── white.bmp           # White texture
-│   ├── teeth.bmp           # Teeth texture
-│   ├── plastic.bmp         # Plastic texture
-│   ├── eye.bmp             # Eye texture
-│   ├── hand.bmp            # Hand texture
-│   ├── leg.bmp             # Leg texture
-│   ├── foot.bmp            # Foot texture
-│   └── blackdc.bmp         # Dark texture
-└── .gitignore
-```
-
 ## Technical Highlights
 
 - Hierarchical modelling is used to position and rotate separate character components.
