@@ -36,8 +36,7 @@ The project uses custom geometry, lighting, textures, hierarchical transformatio
 
 1. Clone or download this repository.
 2. Open `Test1.sln` in Visual Studio.
-3. Select either the `Debug` or `Release` build configuration.
-4. Build and run the project with `Ctrl + F5` or `F5`.
+3. Build and run the project.
 
 > Keep the BMP texture files in the `Test1` folder. The application loads these files at runtime.
 
