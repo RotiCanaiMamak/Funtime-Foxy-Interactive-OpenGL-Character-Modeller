@@ -1,6 +1,6 @@
 # Funtime Foxy OpenGL Model
 
-An interactive 3D Funtime Foxy character model created with C++ and legacy OpenGL for the **BMCS2173 Graphics Programming** assignment.
+An interactive 3D Funtime Foxy character model created with C++ and legacy OpenGL for the **Graphics Programming** assignment.
 
 The project uses custom geometry, lighting, textures, hierarchical transformations, and keyboard/mouse controls to render and manipulate the model.
 
