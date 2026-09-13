@@ -90,7 +90,3 @@ Test1/
 - Textures are loaded from BMP files using the Win32 API.
 - Lighting uses `GL_LIGHT0` with ambient and diffuse material properties.
 - The camera supports both orthographic and perspective projections.
-
-## Notes
-
-This project was developed for educational purposes as part of a graphics programming assignment. Funtime Foxy is a character from the *Five Nights at Freddy’s* franchise; all related character rights belong to their respective owners.
