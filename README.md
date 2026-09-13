@@ -7,10 +7,10 @@ The project uses custom geometry, lighting, textures, hierarchical transformatio
 ## Features
 
 - Textured 3D Funtime Foxy model
-- Custom-built head, body, hands, legs, feet, and tail
+- Custom built head, body, hands, legs, feet, and tail
 - OpenGL lighting and depth testing
 - BMP texture loading for metal, plastic, eyes, teeth, limbs, and other details
-- Mouse-controlled camera rotation
+- Camera rotation, controlled by mouse and keyboard keys
 - Orthographic and perspective camera views
 - Adjustable light position
 - Articulated limb controls
