@@ -63,6 +63,7 @@ The project uses custom geometry, lighting, textures, hierarchical transformatio
 | `M` / `N` | Rotate selected arm joint on the Z axis |
 | `Esc` | Exit the application |
 
+
 ## Technical Highlights
 
 - Hierarchical modelling is used to position and rotate separate character components.
